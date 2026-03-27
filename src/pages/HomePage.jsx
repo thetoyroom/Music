@@ -61,7 +61,7 @@ export default function HomePage() {
             Hi-Res<br />Audio.<br />Streaming.
           </h1>
           <div className={styles.heroBorder}>
-            <p>Premium lossless audio streaming — up to 9216 kbps FLAC. Search anything, play instantly.</p>
+            <p>We steal the bits so you don't have to. 9216 kbps of pure, unadulterated snobbery. If you can't hear the difference, your ears are probably as budget as your headphones.</p>
           </div>
           <div className={styles.heroActions}>
             <button

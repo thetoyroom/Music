@@ -23,6 +23,17 @@ export function Sidebar() {
   const navigate = useNavigate();
   const theme = useAppStore((s) => s.theme);
   const toggleTheme = useAppStore((s) => s.toggleTheme);
+  const [searchQ, setSearchQ] = useState('');
+  const [searchActive, setSearchActive] = useState(false);
+
+  const handleSearch = (e) => {
+    const val = e.target.value;
+    setSearchQ(val);
+    if (val.trim()) {
+      navigate(`/search?q=${encodeURIComponent(val.trim())}`, { replace: searchActive });
+      setSearchActive(true);
+    }
+  };
 
   return (
     <aside className={styles.sidebar}>
@@ -33,7 +44,6 @@ export function Sidebar() {
           <span className={styles.logoAccent}>■</span>
         </NavLink>
       </div>
-
 
       {/* Main nav */}
       <div className={styles.navSection}>

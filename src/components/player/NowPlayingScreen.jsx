@@ -7,7 +7,7 @@ import { getLyrics } from '../../api/monochrome.js';
 import {
   ChevronLeftIcon, PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, Repeat1Icon, HeartIcon, SpinnerIcon, DotsIcon,
-  LyricsIcon, DownloadIcon, PlusIcon, LibraryIcon, QuotesIcon
+  LyricsIcon, DownloadIcon, PlusIcon, LibraryIcon
 } from '../Icons.jsx';
 import { downloadTrack } from '../../utils/download.js';
 import styles from './NowPlayingScreen.module.css';
@@ -100,9 +100,7 @@ export default function NowPlayingScreen() {
     audioEngine.seek(pct * duration);
   };
 
-  const progressPct = (duration > 0 && isFinite(duration) && isFinite(progress)) 
-    ? (progress / duration) * 100 
-    : 0;
+  const progressPct = duration > 0 ? (progress / duration) * 100 : 0;
 
   const renderLyrics = () => {
     if (!lyrics) {
@@ -161,7 +159,7 @@ export default function NowPlayingScreen() {
               className={`${styles.lyricsToggle} ${showLyricsMobile ? styles.lyricsToggleActive : ''}`}
               onClick={() => setShowLyricsMobile(!showLyricsMobile)}
             >
-              <QuotesIcon size={24} />
+              <LyricsIcon size={20} />
             </button>
           )}
           <button 

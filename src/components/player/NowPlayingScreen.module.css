@@ -87,7 +87,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 10px 24px 30px;
+  padding: clamp(10px, 2vh, 20px) 24px 30px;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
@@ -99,9 +99,9 @@
   max-width: 1200px;
   display: grid;
   grid-template-columns: 1fr 1.2fr;
-  gap: 60px;
+  gap: clamp(20px, 4vw, 80px);
   align-items: center;
-  padding: 20px 60px;
+  padding: 20px clamp(20px, 5vw, 80px);
   overflow: hidden;
 }
 
@@ -122,8 +122,9 @@
 }
 
 .desktopMain .artWrap {
-  max-width: 450px;
-  margin-bottom: 40px;
+  width: 100%;
+  max-width: clamp(300px, 35vw, 500px);
+  margin: 0 auto 40px;
 }
 
 .art {
@@ -157,21 +158,21 @@
 }
 
 .title {
-  font-size: var(--fs-2xl);
+  font-size: clamp(1.5rem, 5vw, 3.5rem);
   font-weight: 900;
   color: var(--text-primary);
-  line-height: 0.95;
+  line-height: 0.9;
   text-transform: uppercase;
   letter-spacing: -0.04em;
 }
 
 .artist {
-  font-size: var(--fs-base);
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
   font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
+  letter-spacing: 0.1em;
+  margin-top: 8px;
 }
 
 .likeBtn {
@@ -398,6 +399,15 @@
 }
 
 @media (max-width: 1023px) {
-  .title { font-size: 1.75rem; }
-  .lyricLine { font-size: 1.8rem; }
+  .lyricLine { font-size: clamp(1.4rem, 4vw, 2.2rem); }
+}
+
+@media (max-height: 700px) and (max-width: 1023px) {
+  .artWrap {
+    max-width: 300px;
+    margin-bottom: 20px;
+  }
+  .info {
+    margin-bottom: 16px;
+  }
 }
