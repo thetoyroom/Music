@@ -6,9 +6,12 @@ import {
   PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, Repeat1Icon,
   VolumeIcon, VolumeMuteIcon, HeartIcon, SpinnerIcon,
+  QueueIcon
 } from '../Icons.jsx';
+import { QueueDrawer } from './QueueDrawer.jsx';
 import { useAppStore } from '../../store/appStore.js';
 import styles from './PlayerFooter.module.css';
+import { useState } from 'react';
 
 function formatTime(s) {
   if (s === undefined || s === null || !isFinite(s) || (s === 0 && !isFinite(s))) return '--:--';
@@ -29,6 +32,7 @@ export function PlayerFooter() {
   const navigate = useNavigate();
   const isLiked = useAppStore((s) => s.isLiked(currentTrack?.id));
   const toggleLike = useAppStore((s) => s.toggleLike);
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
   const progressRef = useRef(null);
 
   const handleProgressClick = useCallback((e) => {
@@ -157,7 +161,17 @@ export function PlayerFooter() {
           className={styles.volumeSlider}
           aria-label="Volume"
         />
+
+        <button 
+          className={`${styles.ctrlBtn} ${isQueueOpen ? styles.ctrlActive : ''}`} 
+          onClick={(e) => { e.stopPropagation(); setIsQueueOpen(!isQueueOpen); }}
+          title="Queue"
+        >
+          <QueueIcon size={18} />
+        </button>
       </div>
+
+      <QueueDrawer isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
     </footer>
   );
 }

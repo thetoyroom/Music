@@ -7,8 +7,9 @@ import { getLyrics } from '../../api/monochrome.js';
 import {
   ChevronLeftIcon, PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, Repeat1Icon, HeartIcon, SpinnerIcon, DotsIcon,
-  LyricsIcon
+  LyricsIcon, DownloadIcon, PlusIcon, LibraryIcon
 } from '../Icons.jsx';
+import { downloadTrack } from '../../utils/download.js';
 import styles from './NowPlayingScreen.module.css';
 
 function formatTime(s) {
@@ -23,8 +24,13 @@ export default function NowPlayingScreen() {
   const {
     currentTrack, isPlaying, isLoading, progress, duration,
     shuffle, repeat, lyrics,
-    setIsPlaying, toggleShuffle, toggleRepeat, next, prev, setLyrics
+    setIsPlaying, toggleShuffle, toggleRepeat, next, prev, setLyrics,
+    addToQueueEnd
   } = usePlayerStore();
+  
+  const addDownload = useAppStore((s) => s.addDownload);
+  const updateProgress = useAppStore((s) => s.updateDownloadProgress);
+  const [menuOpen, setMenuOpen] = useState(false);
   
   const isLiked = useAppStore((s) => s.isLiked(currentTrack?.id));
   const toggleLike = useAppStore((s) => s.toggleLike);
@@ -156,7 +162,27 @@ export default function NowPlayingScreen() {
               <LyricsIcon size={20} />
             </button>
           )}
-          <button className={styles.menuBtn} aria-label="Options"><DotsIcon size={20} /></button>
+          <button 
+            className={styles.menuBtn} 
+            aria-label="Options"
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
+          >
+            <DotsIcon size={20} />
+          </button>
+          
+          {menuOpen && (
+            <div className={styles.menuDropdown} onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => { downloadTrack(currentTrack, addDownload, updateProgress); setMenuOpen(false); }}>
+                <DownloadIcon size={18} /> DOWNLOAD
+              </button>
+              <button onClick={() => { addToQueueEnd(currentTrack); setMenuOpen(false); }}>
+                <PlusIcon size={18} /> ADD TO QUEUE
+              </button>
+              <button onClick={() => { setMenuOpen(false); }}>
+                <LibraryIcon size={18} /> ADD TO PLAYLIST
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

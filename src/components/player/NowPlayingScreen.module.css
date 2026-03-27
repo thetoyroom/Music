@@ -321,7 +321,50 @@
 .headerActions {
   display: flex;
   align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  z-index: 1000;
+  min-width: 200px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.menuDropdown button {
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
   gap: 12px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.menuDropdown button:last-child {
+  border-bottom: none;
+}
+
+.menuDropdown button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent);
 }
 
 .lyricsToggle {

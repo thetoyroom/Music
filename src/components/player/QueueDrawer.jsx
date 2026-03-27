@@ -1,0 +1,70 @@
+import React from 'react';
+import { usePlayerStore } from '../../store/playerStore';
+import { XIcon, PlayIcon, TrashIcon, ChevronUpIcon, ChevronDownIcon } from '../Icons';
+import styles from './QueueDrawer.module.css';
+
+export function QueueDrawer({ isOpen, onClose }) {
+  const { 
+    queue, queueIndex, jumpToQueueIndex, removeFromQueue, moveInQueue, currentTrack 
+  } = usePlayerStore();
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.drawer} onClick={e => e.stopPropagation()}>
+        <header className={styles.header}>
+          <h3>PLAY QUEUE ({queue.length})</h3>
+          <button className={styles.closeBtn} onClick={onClose}>
+            <XIcon size={20} />
+          </button>
+        </header>
+
+        <div className={styles.list}>
+          {queue.length === 0 ? (
+            <div className={styles.empty}>Queue is empty</div>
+          ) : (
+            queue.map((track, i) => {
+              const isActive = i === queueIndex;
+              return (
+                <div key={`${track.id}-${i}`} className={`${styles.item} ${isActive ? styles.itemActive : ''}`}>
+                  <div className={styles.itemIndex}>{i + 1}</div>
+                  <div className={styles.itemInfo} onClick={() => jumpToQueueIndex(i)}>
+                    <div className={styles.itemTitle}>{track.title}</div>
+                    <div className={styles.itemArtist}>{track.artist}</div>
+                  </div>
+                  
+                  <div className={styles.itemActions}>
+                    <button 
+                      className={styles.actionBtn} 
+                      onClick={() => moveInQueue(i, i - 1)}
+                      disabled={i === 0}
+                      title="Move Up"
+                    >
+                      <ChevronUpIcon size={16} />
+                    </button>
+                    <button 
+                      className={styles.actionBtn} 
+                      onClick={() => moveInQueue(i, i + 1)}
+                      disabled={i === queue.length - 1}
+                      title="Move Down"
+                    >
+                      <ChevronDownIcon size={16} />
+                    </button>
+                    <button 
+                      className={`${styles.actionBtn} ${styles.removeBtn}`}
+                      onClick={() => removeFromQueue(i)}
+                      title="Remove"
+                    >
+                      <XIcon size={16} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

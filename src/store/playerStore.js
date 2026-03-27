@@ -54,6 +54,65 @@ export const usePlayerStore = create(
       set((s) => ({ queue: [...s.queue, track] }));
     },
 
+    removeFromQueue: (index) => {
+      const { queue, queueIndex } = get();
+      if (index < 0 || index >= queue.length) return;
+      
+      const newQueue = queue.filter((_, i) => i !== index);
+      let newIndex = queueIndex;
+      
+      if (index === queueIndex) {
+        // If removing current track, play next if possible
+        if (newQueue.length === 0) {
+          newIndex = -1;
+        } else {
+          newIndex = Math.min(index, newQueue.length - 1);
+        }
+      } else if (index < queueIndex) {
+        newIndex = queueIndex - 1;
+      }
+      
+      set({ 
+        queue: newQueue, 
+        queueIndex: newIndex,
+        currentTrack: newIndex >= 0 ? newQueue[newIndex] : null,
+        isPlaying: newIndex >= 0 && get().isPlaying
+      });
+    },
+
+    moveInQueue: (from, to) => {
+      const { queue, queueIndex } = get();
+      if (from < 0 || from >= queue.length || to < 0 || to >= queue.length) return;
+      
+      const newQueue = [...queue];
+      const [removed] = newQueue.splice(from, 1);
+      newQueue.splice(to, 0, removed);
+      
+      let newIndex = queueIndex;
+      if (from === queueIndex) {
+        newIndex = to;
+      } else if (from < queueIndex && to >= queueIndex) {
+        newIndex = queueIndex - 1;
+      } else if (from > queueIndex && to <= queueIndex) {
+        newIndex = queueIndex + 1;
+      }
+      
+      set({ queue: newQueue, queueIndex: newIndex });
+    },
+
+    jumpToQueueIndex: (index) => {
+      const { queue } = get();
+      if (index < 0 || index >= queue.length) return;
+      set({
+        queueIndex: index,
+        currentTrack: queue[index],
+        isPlaying: true,
+        isLoading: true,
+        progress: 0,
+        streamError: null,
+      });
+    },
+
     setQueue: (tracks, index = 0) => {
       set({
         queue: tracks,
