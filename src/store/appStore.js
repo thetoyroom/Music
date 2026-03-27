@@ -88,6 +88,17 @@ export const useAppStore = create(
         set((s) => ({
           downloads: s.downloads.filter((d) => d.id !== id),
         })),
+      setGaplessPlayback: (val) => set({ gaplessPlayback: val }),
+
+      // ─── Onboarding ───────────────────────────────────────────────────────
+      hasCompletedOnboarding: false,
+      gaplessPlayback: true,
+      onboardingData: {
+        genres: [],
+        artists: [],
+      },
+      completeOnboarding: (data) =>
+        set({ onboardingData: data, hasCompletedOnboarding: true }),
     }),
     {
       name: 'steqmusic-app-store',
@@ -98,6 +109,7 @@ export const useAppStore = create(
         likedTracks: s.likedTracks,
         playlists: s.playlists,
         hasCompletedOnboarding: s.hasCompletedOnboarding,
+        gaplessPlayback: s.gaplessPlayback,
         onboardingData: s.onboardingData,
       }),
     }

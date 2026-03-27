@@ -189,7 +189,7 @@ export default function NowPlayingScreen() {
 
       <main className={`${styles.main} ${isDesktop ? styles.desktopMain : ''}`}>
         {/* Left Side: Art + Primary Info (Mobile hides this if lyrics open) */}
-        <section className={`${styles.primarySection} ${showLyricsMobile ? styles.hideMobile : ''} ${isDesktop && !(isDesktop ? showLyricsDesktop : showLyricsMobile) ? styles.centered : ''}`}>
+        <section className={`${styles.primarySection} ${showLyricsMobile ? styles.hideMobile : ''}`}>
           <div className={styles.mainVisual}>
             {viewMode === 'art' ? (
               <div className={styles.artWrap}>
@@ -206,54 +206,15 @@ export default function NowPlayingScreen() {
                   <button onClick={() => setViewMode('art')}><XIcon size={18} /></button>
                 </div>
                 <div className={styles.queueScroll}>
-                  {queue.slice(currentTrackIndex + 1).map((track, i) => {
-                    const actualIndex = currentTrackIndex + 1 + i;
-                    return (
-                      <div 
-                        key={track.id + i} 
-                        className={styles.queueItem}
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData('text/plain', actualIndex);
-                          e.currentTarget.classList.add(styles.dragging);
-                        }}
-                        onDragEnd={(e) => {
-                          e.currentTarget.classList.remove(styles.dragging);
-                        }}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                          if (isNaN(fromIndex) || fromIndex === actualIndex) return;
-                          const newQueue = [...queue];
-                          const [removed] = newQueue.splice(fromIndex, 1);
-                          newQueue.splice(actualIndex, 0, removed);
-                          setQueue(newQueue);
-                        }}
-                        onClick={() => audioEngine.playTrack(track, queue, actualIndex)}
-                      >
-                        <div className={styles.dragHandle}>
-                          <DragHandleIcon size={14} />
-                        </div>
-                        <img src={track.coverUrl} alt="" />
-                        <div className={styles.queueItemInfo}>
-                          <p>{track.title}</p>
-                          <span>{track.artist}</span>
-                        </div>
-                        <button 
-                          className={styles.removeBtn}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const newQueue = [...queue];
-                            newQueue.splice(actualIndex, 1);
-                            setQueue(newQueue);
-                          }}
-                        >
-                          <XIcon size={16} />
-                        </button>
+                  {queue.slice(currentTrackIndex + 1).map((track, i) => (
+                    <div key={track.id + i} className={styles.queueItem}>
+                      <img src={track.coverUrl} alt="" />
+                      <div className={styles.queueItemInfo}>
+                        <p>{track.title}</p>
+                        <span>{track.artist}</span>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                   {queue.length <= currentTrackIndex + 1 && (
                     <p className={styles.queueEmpty}>QUEUE ENDS HERE</p>
                   )}

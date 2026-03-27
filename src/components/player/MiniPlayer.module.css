@@ -56,10 +56,11 @@
 
 .meta {
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  min-width: 0;
+  gap: 1px;
+  margin-right: 8px;
 }
 
 .title {
@@ -95,17 +96,27 @@
 .controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
 .iconBtn {
   color: var(--text-secondary);
-  padding: 4px;
-  transition: color 0.15s;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
-.iconBtn:hover { color: var(--accent); }
+.iconBtn:hover {
+  color: var(--text-primary);
+}
+
+.iconBtn:active {
+  transform: scale(0.9);
+}
+
 .liked { color: var(--accent) !important; }
 
 .playBtn {

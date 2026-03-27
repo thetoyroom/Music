@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePlayerStore } from '../../store/playerStore.js';
 import { audioEngine } from '../../engine/AudioEngine.js';
-import { PlayIcon, PauseIcon, HeartIcon, SpinnerIcon } from '../Icons.jsx';
+import { PlayIcon, PauseIcon, HeartIcon, SpinnerIcon, SkipNextIcon, SkipPrevIcon, PlusSquareIcon } from '../Icons.jsx';
+import { QueueDrawer } from './QueueDrawer.jsx';
 import { useAppStore } from '../../store/appStore.js';
 import styles from './MiniPlayer.module.css';
 
@@ -14,7 +15,11 @@ function formatTime(s) {
 }
 
 export function MiniPlayer() {
-  const { currentTrack, isPlaying, isLoading, progress, duration, setIsPlaying } = usePlayerStore();
+  const { 
+    currentTrack, isPlaying, isLoading, progress, duration, 
+    setIsPlaying, next, prev 
+  } = usePlayerStore();
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
   const isLiked = useAppStore((s) => s.isLiked(currentTrack?.id));
   const toggleLike = useAppStore((s) => s.toggleLike);
   const navigate = useNavigate();
@@ -73,6 +78,10 @@ export function MiniPlayer() {
           >
             <HeartIcon size={20} filled={isLiked} />
           </button>
+          
+          <button className={styles.iconBtn} onClick={prev} aria-label="Previous">
+            <SkipPrevIcon size={18} />
+          </button>
 
           <button
             className={styles.playBtn}
@@ -81,8 +90,21 @@ export function MiniPlayer() {
           >
             {isLoading ? <SpinnerIcon size={22} /> : isPlaying ? <PauseIcon size={22} /> : <PlayIcon size={22} />}
           </button>
+
+          <button className={styles.iconBtn} onClick={next} aria-label="Next">
+            <SkipNextIcon size={18} />
+          </button>
+
+          <button 
+            className={styles.iconBtn}
+            onClick={() => setIsQueueOpen(!isQueueOpen)}
+            aria-label="Queue"
+          >
+            <PlusSquareIcon size={18} />
+          </button>
         </div>
       </div>
+      <QueueDrawer isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
     </div>
   );
 }

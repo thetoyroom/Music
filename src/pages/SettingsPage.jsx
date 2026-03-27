@@ -4,7 +4,10 @@ import { ChevronRightIcon } from '../components/Icons.jsx';
 import styles from './SettingsPage.module.css';
 
 export default function SettingsPage() {
-  const { theme, toggleTheme, quality, setQuality } = useAppStore();
+  const {
+    theme, toggleTheme, quality, setQuality,
+    gaplessPlayback, setGaplessPlayback
+  } = useAppStore();
   const { clearQueue } = usePlayerStore();
 
   return (
@@ -44,6 +47,19 @@ export default function SettingsPage() {
 
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Playback</h2>
+
+        <div className={styles.row}>
+          <div className={styles.rowInfo}>
+            <span className={styles.rowLabel}>Gapless Playback</span>
+            <span className={styles.rowDesc}>Eliminate silence between tracks</span>
+          </div>
+          <button 
+            className={styles.toggleBtn} 
+            onClick={() => setGaplessPlayback(!gaplessPlayback)}
+          >
+            {gaplessPlayback ? 'ON' : 'OFF'}
+          </button>
+        </div>
 
         <div className={styles.row}>
           <div className={styles.rowInfo}>
