@@ -139,6 +139,9 @@ class AudioEngine {
       const st = usePlayerStore.getState();
       el.volume = st.isMuted ? 0 : st.volume;
 
+      // Ensure we are still loading the same track before playing
+      if (this._currentTrackId !== track.id) return;
+
       await el.play();
       const dur = el.duration;
       if (isFinite(dur)) setDuration(dur);
