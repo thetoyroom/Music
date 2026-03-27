@@ -157,15 +157,16 @@
 }
 
 .title {
-  font-size: 2.25rem;
+  font-size: var(--fs-2xl);
   font-weight: 900;
   color: var(--text-primary);
-  line-height: 0.9;
+  line-height: 0.95;
   text-transform: uppercase;
   letter-spacing: -0.04em;
 }
 
 .artist {
+  font-size: var(--fs-base);
   font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;
@@ -284,7 +285,7 @@
 .lyricsList::-webkit-scrollbar { display: none; }
 
 .lyricLine {
-  font-size: 2.5rem;
+  font-size: var(--fs-xl);
   font-weight: 900;
   line-height: 1.1;
   margin-bottom: 24px;

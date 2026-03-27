@@ -68,12 +68,25 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
         }
       }
 
-      const blob = new Blob(chunks, { type: 'audio/mpeg' });
+      const contentType = response.headers.get('content-type') || 'audio/mpeg';
+      const extensionMap = {
+        'audio/flac': 'flac',
+        'audio/mpeg': 'mp3',
+        'audio/mp4': 'm4a',
+        'audio/x-m4a': 'm4a',
+        'audio/ogg': 'ogg',
+        'audio/wav': 'wav',
+        'audio/webm': 'webm'
+      };
+      
+      const ext = extensionMap[contentType] || (contentType.includes('flac') ? 'flac' : 'mp3');
+      const blob = new Blob(chunks, { type: contentType });
       const url = window.URL.createObjectURL(blob);
       const safeName = `${track.artist} - ${track.title}`.replace(/[<>:"/\\|?*]/g, '_');
+      
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${safeName}.mp3`;
+      a.download = `${safeName}.${ext}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -93,27 +106,24 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
 
   return (
     <div
-      className={`${styles.row} ${isCurrent ? styles.active : ''}`}
+      className={`${styles.row} ${isCurrent ? styles.active : ''} ${!showArtwork ? styles.noArtwork : ''}`}
       onClick={handlePlay}
     >
       {/* Play indicator / number */}
       <div className={styles.indexCell}>
-        {isCurrent ? (
-          <button className={styles.playBtn} onClick={handlePlay}>
-            {isCurrentPlaying ? (
-              <span className="eq-bars">
-                <span style={{ height: '60%' }} />
-                <span style={{ height: '100%' }} />
-                <span style={{ height: '40%' }} />
-              </span>
-            ) : (
-              <PlayIcon size={14} />
-            )}
-          </button>
+        {isCurrent && isCurrentPlaying ? (
+          <span className="eq-bars">
+            <span style={{ height: '60%' }} />
+            <span style={{ height: '100%' }} />
+            <span style={{ height: '40%' }} />
+          </span>
         ) : (
-          <button className={styles.playBtn} onClick={handlePlay} aria-label="Play">
-            <PlayIcon size={14} />
-          </button>
+          <>
+            <span className={styles.indexNumber}>{index + 1}</span>
+            <button className={styles.playBtn} onClick={handlePlay} aria-label="Play">
+              <PlayIcon size={14} />
+            </button>
+          </>
         )}
       </div>
 

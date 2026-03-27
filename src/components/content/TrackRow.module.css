@@ -2,12 +2,17 @@
   display: grid;
   grid-template-columns: 32px 44px 1fr auto;
   align-items: center;
-  gap: 10px;
-  padding: 6px 8px;
+  gap: clamp(6px, 1vw, 12px);
+  padding: clamp(4px, 1vh, 8px) 8px;
   border-radius: 0;
   cursor: default;
   transition: background 0.15s;
   border: 2px solid transparent;
+  width: 100%;
+}
+
+.row.noArtwork {
+  grid-template-columns: 32px 1fr auto;
 }
 
 .row:hover {
@@ -23,21 +28,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  width: 32px;
+}
+
+.indexNumber {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  transition: opacity 0.1s;
+}
+
+.row:hover .indexNumber {
+  opacity: 0;
 }
 
 .playBtn {
-  width: 28px;
-  height: 28px;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   opacity: 0;
   transition: opacity 0.15s, color 0.15s;
 }
 
-.row:hover .playBtn,
-.active .playBtn {
+.row:hover .playBtn {
   opacity: 1;
 }
 
@@ -80,7 +97,7 @@
 }
 
 .title {
-  font-size: 0.82rem;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--text-primary);
   display: block;
@@ -112,7 +129,7 @@
 }
 
 .artist {
-  font-size: 0.68rem;
+  font-size: var(--fs-xs);
   font-weight: 500;
   color: var(--text-secondary);
   background: none;
@@ -129,7 +146,7 @@
 .artist:hover { color: var(--text-primary); }
 
 .album {
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
   color: var(--text-secondary);
   background: none;
   border: none;
@@ -147,6 +164,9 @@
 @media (min-width: 768px) {
   .row {
     grid-template-columns: 32px 44px 1fr auto;
+  }
+  .row.noArtwork {
+    grid-template-columns: 48px 1fr auto;
   }
 }
 
