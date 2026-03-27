@@ -57,9 +57,26 @@ export default function StarterPage() {
         setIsSearching(true);
         try {
           const res = await searchArtists(searchQuery);
-          setSearchResults(res?.data?.items || res?.artists?.items || []);
+          let rawItems = [];
+          if (Array.isArray(res)) rawItems = res;
+          else if (res?.data?.artists?.items) rawItems = res.data.artists.items;
+          else if (res?.data?.items) rawItems = res.data.items;
+          else if (res?.artists?.items) rawItems = res.artists.items;
+          else if (res?.items) rawItems = res.items;
+          else if (res?.data) rawItems = Array.isArray(res.data) ? res.data : [];
+
+          const normalized = rawItems.map(item => {
+            const artist = item.item || item;
+            return {
+              id: artist.id || artist.tidalId || Math.random().toString(),
+              name: artist.name || artist.artistName || 'Unknown Artist',
+              picture: artist.picture || artist.artistPicture || artist.pictureId,
+            };
+          });
+          setSearchResults(normalized);
         } catch (e) {
-          console.error(e);
+          console.error('[Starter] Search Error:', e);
+          setSearchResults([]);
         } finally {
           setIsSearching(false);
         }
@@ -67,6 +84,7 @@ export default function StarterPage() {
       return () => clearTimeout(timer);
     } else {
       setSearchResults([]);
+      setIsSearching(false);
     }
   }, [searchQuery]);
 
@@ -163,21 +181,27 @@ export default function StarterPage() {
               </div>
               <div className={styles.artistGrid}>
                 {(searchQuery.length > 2 ? searchResults : FEATURED_ARTISTS).slice(0, 12).map(artist => {
-                  const isSelected = selectedArtists.some(a => a.name === (artist.name || artist.artistName));
+                  const isSelected = selectedArtists.some(a => a.name === artist.name);
                   return (
                     <div 
                       key={artist.id} 
                       className={`${styles.artistCard} ${isSelected ? styles.artistSelected : ''}`}
-                      onClick={() => toggleArtist({ name: artist.name || artist.artistName, id: artist.id })}
+                      onClick={() => toggleArtist({ name: artist.name, id: artist.id })}
                     >
                       <div className={styles.artistImgWrap}>
-                        <img src={artist.img || getArtistPictureUrl(artist.picture || artist.artistPicture, 160)} alt={artist.name} />
+                        <img src={artist.img || getArtistPictureUrl(artist.picture, 160)} alt={artist.name} />
                         {isSelected && <div className={styles.artistCheck}><Icons.Check size={20} /></div>}
                       </div>
-                      <span>{artist.name || artist.artistName}</span>
+                      <span className={styles.artistName}>{artist.name}</span>
                     </div>
                   );
                 })}
+                {isSearching && (
+                  <div className={styles.noResults}>Searching database...</div>
+                )}
+                {searchQuery.length > 2 && searchResults.length === 0 && !isSearching && (
+                  <div className={styles.noResults}>No artists found. Try another name.</div>
+                )}
               </div>
             </section>
           )}
