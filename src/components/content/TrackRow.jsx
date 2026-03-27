@@ -68,11 +68,12 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
         }
       }
 
-      const blob = new Blob(chunks);
+      const blob = new Blob(chunks, { type: 'audio/mpeg' });
       const url = window.URL.createObjectURL(blob);
+      const safeName = `${track.artist} - ${track.title}`.replace(/[<>:"/\\|?*]/g, '_');
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${track.artist} - ${track.title}.mp3`;
+      a.download = `${safeName}.mp3`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

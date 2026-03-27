@@ -41,11 +41,19 @@ function AppShell() {
   const isNowPlayingRoute = location.pathname === '/now-playing';
   const isStarterRoute = location.pathname === '/starter';
 
-  // Screen width observer for responsive rendering
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  // Screen width & orientation observer for responsive rendering
+  const checkIsDesktop = () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const isLandscape = width > height;
+    // Standard desktop breakpoint or landscape on mobile
+    return width >= 768 || (isLandscape && width >= 480);
+  };
+
+  const [isDesktop, setIsDesktop] = useState(checkIsDesktop());
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    const handleResize = () => setIsDesktop(checkIsDesktop());
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);

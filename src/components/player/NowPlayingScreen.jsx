@@ -32,12 +32,19 @@ export default function NowPlayingScreen() {
   const lyricsListRef = useRef(null);
   
   const [showLyricsMobile, setShowLyricsMobile] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const checkIsDesktop = () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const isLandscape = width > height;
+    return width >= 768 || (isLandscape && width >= 480);
+  };
+
+  const [isDesktop, setIsDesktop] = useState(checkIsDesktop());
 
   console.log('[NowPlaying] Render', { trackId: currentTrack?.id, isDesktop, showLyricsMobile });
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    const handleResize = () => setIsDesktop(checkIsDesktop());
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
