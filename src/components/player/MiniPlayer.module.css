@@ -1,0 +1,111 @@
+.container {
+  background: var(--bg-surface);
+  border-top: 2px solid var(--border);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--bg-surface-hover);
+}
+
+.stripFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.15s linear;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.artworkBtn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.artwork {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.artworkFallback {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #222, #111);
+  border: 1px solid var(--border);
+}
+
+.meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: block;
+}
+
+.artist {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  color: var(--text-secondary);
+  padding: 4px;
+  transition: color 0.15s;
+}
+
+.iconBtn:hover { color: var(--accent); }
+.liked { color: var(--accent) !important; }
+
+.playBtn {
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+
+.playBtn:active { transform: scale(0.9); }

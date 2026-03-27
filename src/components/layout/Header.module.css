@@ -1,0 +1,105 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 10px;
+  background: var(--bg-base);
+  border-bottom: 2px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 30;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-weight: 900;
+  font-size: 1.2rem;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  gap: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.logoAccent {
+  color: var(--accent);
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-left: 1px;
+  margin-top: -3px;
+  display: inline-block;
+}
+
+.searchWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid var(--border);
+  background: var(--bg-surface);
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  transition: border-color 0.2s;
+  min-width: 0;
+}
+
+.searchWrap:focus-within {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.searchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
+  min-width: 0;
+}
+
+.searchInput::placeholder {
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.iconBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+/* Desktop: hide logo in header (it's in sidebar) */
+@media (min-width: 768px) {
+  .logo {
+    display: none;
+  }
+
+  .header {
+    padding: 14px 24px;
+  }
+}

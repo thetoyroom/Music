@@ -1,0 +1,120 @@
+.page {
+  padding: 20px 16px 40px;
+  max-width: 800px;
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  margin-bottom: 8px;
+  gap: 16px;
+}
+
+.rowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowLabel {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rowDesc {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.toggleBtn,
+.actionBtn {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.toggleBtn:hover,
+.actionBtn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.select {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 10px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  outline: none;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.select:focus {
+  border-color: var(--accent);
+}
+
+.linkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  margin-bottom: 8px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+
+a.linkRow:hover {
+  border-color: var(--text-primary);
+}
+
+.versionLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}

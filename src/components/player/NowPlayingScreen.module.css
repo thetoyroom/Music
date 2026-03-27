@@ -1,0 +1,341 @@
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg-main);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bgImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(80px) saturate(1.5);
+  transform: scale(1.2);
+  opacity: 0.6;
+}
+
+[data-theme='light'] .bgImage {
+  opacity: 0.3;
+}
+
+.bgOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), var(--bg-main) 70%);
+}
+
+[data-theme='light'] .bgOverlay {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1), var(--bg-main) 70%);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  margin-top: env(safe-area-inset-top, 0);
+}
+
+.backBtn, .menuBtn {
+  color: var(--text-primary);
+  padding: 8px;
+}
+
+.headerTitle {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 24px 30px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  overflow-y: auto;
+}
+
+.desktopMain {
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 60px;
+  align-items: center;
+  padding: 20px 60px;
+  overflow: hidden;
+}
+
+.primarySection {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.4s ease;
+}
+
+.artWrap {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 4px solid #000;
+  box-shadow: 12px 12px 0px 0px #000;
+  margin-bottom: 30px;
+  background: var(--bg-surface);
+  position: relative;
+}
+
+.desktopMain .artWrap {
+  max-width: 450px;
+  margin-bottom: 40px;
+}
+
+.art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #111, #333);
+}
+
+.info {
+  margin-bottom: 24px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.titles {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 0.9;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+}
+
+.artist {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.likeBtn {
+  color: var(--text-secondary);
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.liked { color: var(--accent) !important; }
+
+.badge {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 2px 6px;
+  border: 1px solid currentColor;
+  font-size: 0.6rem;
+  font-weight: 900;
+}
+
+.scrubberWrap {
+  margin-bottom: 24px;
+}
+
+.waveformWrap {
+  width: 100%;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.waveBar {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  height: 20%;
+  transition: height 0.1s ease, background 0.2s ease;
+}
+
+.waveActive {
+  background: var(--accent);
+}
+
+.timeRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ctrlBtn {
+  color: var(--text-primary);
+  opacity: 0.8;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.ctrlBtn:active { opacity: 0.5; }
+
+.activeCtrl { color: var(--accent); opacity: 1; }
+
+.playBtnBrutalist {
+  width: 70px;
+  height: 70px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px 0px #000;
+  transition: all 0.1s;
+  cursor: pointer;
+}
+
+.playBtnBrutalist:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px 0px #000;
+}
+
+/* --- Lyrics Section --- */
+
+.lyricsSection {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.4s ease;
+  overflow: hidden;
+}
+
+.desktopMain .lyricsSection {
+  height: 80vh;
+}
+
+.lyricsList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 0;
+  mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  scrollbar-width: none;
+}
+
+.lyricsList::-webkit-scrollbar { display: none; }
+
+.lyricLine {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  transform-origin: left;
+}
+
+.lyricActive {
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.lyricPast {
+  color: rgba(255,255,255,0.1);
+}
+
+.lyricsPlaceholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 40px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lyricsToggle {
+  padding: 8px;
+  color: var(--text-primary);
+  transition: color 0.2s;
+}
+
+.lyricsToggleActive {
+  color: var(--accent);
+}
+
+.lyricsCloseMobile {
+  width: 100%;
+  padding: 16px;
+  background: #000;
+  color: #fff;
+  font-weight: 900;
+  border: 2px solid #333;
+  margin-top: 10px;
+  letter-spacing: 0.2em;
+}
+
+.hideMobile {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1023px) {
+  .title { font-size: 1.75rem; }
+  .lyricLine { font-size: 1.8rem; }
+}

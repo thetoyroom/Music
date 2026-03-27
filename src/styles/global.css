@@ -1,0 +1,399 @@
+/* ═══════════════════════════════════════════════════════════
+   SteqMusic Global Styles — Design: brutalist, dark-first
+   Accent: #ff3300 | Font: Inter | No border-radius by default
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ─── CSS Variables ─────────────────────────────────────── */
+:root {
+  /* Dark theme (default) */
+  --bg-base: #050505;
+  --bg-main: #0a0a0c;
+  --bg-surface: #141517;
+  --bg-surface-hover: #222326;
+  --text-primary: #ffffff;
+  --text-secondary: #888b94;
+  --accent: #ff3300;
+  --accent-hover: #e62e00;
+  --border: #222328;
+  --border-subtle: #1a1a1e;
+  --hero-bg: #0a0a0c;
+  --shadow-brutal: none;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(10, 10, 12, 0.88);
+  --dots-color: rgba(255, 255, 255, 0.05);
+  --player-bg: #0e0e10;
+  --scrollbar-thumb: #2a2a30;
+}
+
+[data-theme='light'] {
+  --bg-base: #e6e4dc;
+  --bg-main: #f3f2ee;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #eae8e1;
+  --text-primary: #0a0a0c;
+  --text-secondary: #666870;
+  --accent: #ff3300;
+  --accent-hover: #e62e00;
+  --border: #d0ceca;
+  --border-subtle: #e0deda;
+  --hero-bg: #f9f8f5;
+  --shadow-brutal: 4px 4px 0px 0px #0a0a0c;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --glass-bg: rgba(243, 242, 238, 0.88);
+  --dots-color: rgba(10, 10, 12, 0.08);
+  --player-bg: #ffffff;
+  --scrollbar-thumb: #c0bdb7;
+}
+
+/* ─── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Typography ─────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ─── Scrollbars ────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 2px;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Selection ─────────────────────────────────────────── */
+::selection {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* ─── Focus ───────────────────────────────────────────────  */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ─── Transitions ────────────────────────────────────────── */
+.transition-colors {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.transition-transform {
+  transition: transform 0.25s ease;
+}
+
+.transition-opacity {
+  transition: opacity 0.2s ease;
+}
+
+/* ─── Progress Bar ───────────────────────────────────────── */
+.progress-bar {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  background: var(--bg-surface-hover);
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.progress-bar::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+}
+
+.progress-bar::-webkit-slider-runnable-track {
+  height: 4px;
+}
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes equalizer {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease both;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ─── Skeleton Loading ───────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--bg-surface-hover) 50%,
+    var(--bg-surface) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ─── Equalizer bars (playing indicator) ─────────────────── */
+.eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.eq-bars span {
+  display: block;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 1px;
+  transform-origin: bottom;
+}
+
+.eq-bars span:nth-child(1) { animation: equalizer 0.8s ease infinite; }
+.eq-bars span:nth-child(2) { animation: equalizer 0.8s ease 0.15s infinite; }
+.eq-bars span:nth-child(3) { animation: equalizer 0.8s ease 0.3s infinite; }
+
+/* ─── Utility classes ────────────────────────────────────── */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uppercase { text-transform: uppercase; }
+
+.font-black { font-weight: 900; }
+.font-bold  { font-weight: 700; }
+.font-semi  { font-weight: 600; }
+.font-med   { font-weight: 500; }
+
+.text-accent { color: var(--accent); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+
+.bg-surface { background-color: var(--bg-surface); }
+.border-subtle { border: 1px solid var(--border); }
+.border-default { border: 2px solid var(--border); }
+
+/* ─── Input reset  ───────────────────────────────────────── */
+input[type='text'],
+input[type='search'] {
+  font-family: inherit;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+}
+
+input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+/* ─── Range / Slider ─────────────────────────────────────── */
+input[type='range'] {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  height: 3px;
+  background: var(--bg-surface-hover);
+  border-radius: 2px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: -4.5px;
+  transition: transform 0.15s;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+}
+
+/* ─── Custom progress track with fill ───────────────────── */
+.progress-container {
+  position: relative;
+  height: 4px;
+  background: var(--bg-surface-hover);
+  cursor: pointer;
+}
+
+.progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--accent);
+  pointer-events: none;
+  transition: width 0.1s linear;
+}
+
+/* ─── Card hover lift ───────────────────────────────────── */
+.hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ─── Overlay cover ─────────────────────────────────────── */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.group:hover .overlay {
+  opacity: 1;
+}
+
+/* dots pattern */
+.dots-bg {
+  background-image: radial-gradient(var(--dots-color) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+}
+
+/* ─── Layout helpers ─────────────────────────────────────── */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Quality badge ─────────────────────────────────────── */
+.quality-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.quality-badge.hifi {
+  color: #00d4aa;
+  border-color: #00d4aa;
+}
+
+.quality-badge.lossless {
+  color: #7b8fff;
+  border-color: #7b8fff;
+}

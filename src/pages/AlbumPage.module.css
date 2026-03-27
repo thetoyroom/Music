@@ -1,0 +1,27 @@
+.page { padding: 20px 16px 40px; max-width: 900px; }
+.loadPage { display: flex; align-items: center; justify-content: center; height: 200px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.errorPage { padding: 40px; color: var(--text-secondary); }
+.errorPage button { margin-top: 12px; padding: 8px 16px; background: var(--bg-surface); border: 2px solid var(--border); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; font-weight: 700; }
+
+.back { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); border: none; background: none; cursor: pointer; margin-bottom: 20px; padding: 0; transition: color 0.15s; }
+.back:hover { color: var(--text-primary); }
+
+.header { display: flex; gap: 24px; margin-bottom: 28px; align-items: flex-start; flex-wrap: wrap; }
+.artWrap { width: 160px; height: 160px; flex-shrink: 0; border: 2px solid var(--border); overflow: hidden; }
+@media (min-width: 600px) { .artWrap { width: 200px; height: 200px; } }
+.art { width: 100%; height: 100%; object-fit: cover; }
+.artFallback { width: 100%; height: 100%; background: linear-gradient(135deg, #2c3e50, #000); }
+
+.meta { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+.metaType { font-size: 0.62rem; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+.title { font-size: clamp(1.4rem, 4vw, 2.5rem); font-weight: 900; letter-spacing: -0.03em; color: var(--text-primary); line-height: 1.1; }
+.artistLink { font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); background: none; border: none; cursor: pointer; padding: 0; text-align: left; transition: color 0.15s; }
+.artistLink:hover { color: var(--text-primary); }
+.metaRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.metaRow span { font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; }
+.playAllBtn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--accent); color: white; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.1em; border: none; cursor: pointer; width: fit-content; transition: background 0.15s; margin-top: 4px; }
+.playAllBtn:hover { background: var(--accent-hover); }
+
+.trackList { display: flex; flex-direction: column; gap: 2px; border-top: 2px solid var(--border); padding-top: 16px; }
