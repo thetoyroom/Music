@@ -59,11 +59,6 @@ export default function SettingsPage() {
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>About</h2>
 
-        <a href="https://monochrome.tf" target="_blank" rel="noreferrer" className={styles.linkRow}>
-          <span className={styles.rowLabel}>Monochrome API Info</span>
-          <ChevronRightIcon size={16} />
-        </a>
-
         <div className={styles.linkRow}>
           <span className={styles.rowLabel}>Version</span>
           <span className={styles.versionLabel}>2.0.0-rc1</span>

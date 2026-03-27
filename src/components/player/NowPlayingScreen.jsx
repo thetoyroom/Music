@@ -159,7 +159,7 @@ export default function NowPlayingScreen() {
               className={`${styles.lyricsToggle} ${showLyricsMobile ? styles.lyricsToggleActive : ''}`}
               onClick={() => setShowLyricsMobile(!showLyricsMobile)}
             >
-              <LyricsIcon size={20} />
+              <QuotesIcon size={24} />
             </button>
           )}
           <button 
