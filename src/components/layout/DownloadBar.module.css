@@ -1,75 +1,95 @@
-.container {
+.islandContainer {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 12px;
   pointer-events: none;
 }
 
-.item {
-  background: #000;
-  border-bottom: 2px solid var(--border);
-  padding: 8px 16px;
+.island {
   pointer-events: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  min-width: 280px;
+  max-width: 400px;
+  background: #000;
+  color: #fff;
+  border-radius: 40px;
+  padding: 12px 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  animation: islandIn 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.info {
+@keyframes islandIn {
+  from {
+    transform: translateY(-40px) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.islandCompleted {
+  border-color: #00FF00;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+.islandContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.islandInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
-.filename {
-  font-size: 0.65rem;
+.islandFilename {
+  font-size: 0.75rem;
   font-weight: 900;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 70%;
+  flex: 1;
 }
 
-.status {
-  font-size: 0.6rem;
+.islandStatus {
+  font-size: 0.75rem;
   font-weight: 900;
   color: var(--accent);
-  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
-.close {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
+.islandCompleted .islandStatus {
+  color: #00FF00;
 }
 
-.progressTrack {
+.islandProgressTrack {
   height: 4px;
-  background: #222;
-  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
   overflow: hidden;
 }
 
-.progressFill {
+.islandProgressFill {
   height: 100%;
-  transition: width 0.3s ease-out;
+  transition: width 0.3s ease;
 }
 
 @media (max-width: 768px) {
-  .container {
-    top: auto;
-    bottom: 160px; /* Above miniplayer and bottom nav */
+  .island {
+    min-width: 240px;
+    padding: 10px 20px;
   }
 }

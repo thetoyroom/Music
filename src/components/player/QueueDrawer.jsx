@@ -1,14 +1,42 @@
-import React from 'react';
 import { usePlayerStore } from '../../store/playerStore';
-import { XIcon, PlayIcon, TrashIcon, ChevronUpIcon, ChevronDownIcon } from '../Icons';
+import { XIcon, PlayIcon, TrashIcon, DragHandleIcon } from '../Icons';
 import styles from './QueueDrawer.module.css';
+import { useState } from 'react';
 
 export function QueueDrawer({ isOpen, onClose }) {
   const { 
     queue, queueIndex, jumpToQueueIndex, removeFromQueue, moveInQueue, currentTrack 
   } = usePlayerStore();
 
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
   if (!isOpen) return null;
+
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    // Set a ghost image or just let default happen
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === index) return;
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    moveInQueue(draggedIndex, index);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -27,7 +55,23 @@ export function QueueDrawer({ isOpen, onClose }) {
             queue.map((track, i) => {
               const isActive = i === queueIndex;
               return (
-                <div key={`${track.id}-${i}`} className={`${styles.item} ${isActive ? styles.itemActive : ''}`}>
+                <div 
+                  key={`${track.id}-${i}`} 
+                  className={`
+                    ${styles.item} 
+                    ${isActive ? styles.itemActive : ''} 
+                    ${draggedIndex === i ? styles.dragging : ''}
+                    ${dragOverIndex === i ? styles.dragOver : ''}
+                  `}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, i)}
+                  onDragOver={(e) => handleDragOver(e, i)}
+                  onDrop={(e) => handleDrop(e, i)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <div className={styles.dragHandle}>
+                    <DragHandleIcon size={16} />
+                  </div>
                   <div className={styles.itemIndex}>{i + 1}</div>
                   <div className={styles.itemInfo} onClick={() => jumpToQueueIndex(i)}>
                     <div className={styles.itemTitle}>{track.title}</div>
@@ -35,22 +79,6 @@ export function QueueDrawer({ isOpen, onClose }) {
                   </div>
                   
                   <div className={styles.itemActions}>
-                    <button 
-                      className={styles.actionBtn} 
-                      onClick={() => moveInQueue(i, i - 1)}
-                      disabled={i === 0}
-                      title="Move Up"
-                    >
-                      <ChevronUpIcon size={16} />
-                    </button>
-                    <button 
-                      className={styles.actionBtn} 
-                      onClick={() => moveInQueue(i, i + 1)}
-                      disabled={i === queue.length - 1}
-                      title="Move Down"
-                    >
-                      <ChevronDownIcon size={16} />
-                    </button>
                     <button 
                       className={`${styles.actionBtn} ${styles.removeBtn}`}
                       onClick={() => removeFromQueue(i)}

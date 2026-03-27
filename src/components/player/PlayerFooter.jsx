@@ -6,7 +6,7 @@ import {
   PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, Repeat1Icon,
   VolumeIcon, VolumeMuteIcon, HeartIcon, SpinnerIcon,
-  QueueIcon
+  PlusSquareIcon
 } from '../Icons.jsx';
 import { QueueDrawer } from './QueueDrawer.jsx';
 import { useAppStore } from '../../store/appStore.js';
@@ -167,7 +167,7 @@ export function PlayerFooter() {
           onClick={(e) => { e.stopPropagation(); setIsQueueOpen(!isQueueOpen); }}
           title="Queue"
         >
-          <QueueIcon size={18} />
+          <PlusSquareIcon size={18} />
         </button>
       </div>
 

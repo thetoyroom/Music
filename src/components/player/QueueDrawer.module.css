@@ -154,8 +154,30 @@
   color: var(--accent);
 }
 
-@media (max-width: 768px) {
-  .drawer {
-    max-width: none;
-  }
+.dragHandle {
+  cursor: grab;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.item:hover .dragHandle {
+  color: var(--text-primary);
+}
+
+.dragging {
+  opacity: 0.4;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dragOver {
+  border-top: 2px solid var(--accent);
+  background: rgba(255, 51, 0, 0.05);
 }
