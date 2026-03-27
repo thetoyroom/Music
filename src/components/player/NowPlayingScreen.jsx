@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { usePlayerStore } from '../../store/playerStore.js';
 import { useAppStore } from '../../store/appStore.js';
 import { audioEngine } from '../../engine/AudioEngine.js';
@@ -32,12 +32,12 @@ export default function NowPlayingScreen() {
   const lyricsListRef = useRef(null);
   
   const [showLyricsMobile, setShowLyricsMobile] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
   console.log('[NowPlaying] Render', { trackId: currentTrack?.id, isDesktop, showLyricsMobile });
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -133,7 +133,13 @@ export default function NowPlayingScreen() {
         <button className={styles.backBtn} onClick={() => navigate(-1)} aria-label="Go back">
           <ChevronLeftIcon size={24} />
         </button>
-        <span className={styles.headerTitle}>NOW PLAYING</span>
+        {!isDesktop && (
+          <NavLink to="/" className={styles.logo}>
+            STEQ<span>MUSIC</span>
+            <span className={styles.logoAccent}>■</span>
+          </NavLink>
+        )}
+        <span className={styles.headerTitle}>{isDesktop ? 'NOW PLAYING' : ''}</span>
         <div className={styles.headerActions}>
           {!isDesktop && (
             <button 
@@ -162,7 +168,12 @@ export default function NowPlayingScreen() {
             <div className={styles.metaRow}>
               <div className={styles.titles}>
                 <h1 className={`${styles.title} truncate`}>{currentTrack.title}</h1>
-                <p className={`${styles.artist} truncate`}>{currentTrack.artist}</p>
+                <button 
+                  className={`${styles.artist} truncate`}
+                  onClick={() => currentTrack.artistId && navigate(`/artist/${currentTrack.artistId}`)}
+                >
+                  {currentTrack.artist}
+                </button>
               </div>
               <button
                 className={`${styles.likeBtn} ${isLiked ? styles.liked : ''}`}

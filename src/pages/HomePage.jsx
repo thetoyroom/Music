@@ -27,9 +27,25 @@ const GRADIENTS = [
   'linear-gradient(135deg, #c0392b, #8e44ad)',
 ];
 
+import { recommendationService } from '../services/recommendationService.js';
+
 export default function HomePage() {
   const navigate = useNavigate();
   const recentlyPlayed = useAppStore((s) => s.recentlyPlayed);
+  const hasCompletedOnboarding = useAppStore((s) => s.hasCompletedOnboarding);
+  
+  const [recommended, setRecommended] = useState([]);
+  const [isLoadingRecs, setIsLoadingRecs] = useState(false);
+
+  useEffect(() => {
+    if (hasCompletedOnboarding) {
+      setIsLoadingRecs(true);
+      recommendationService.getPersonalizedFeed().then(tracks => {
+        setRecommended(tracks);
+        setIsLoadingRecs(false);
+      });
+    }
+  }, [hasCompletedOnboarding]);
 
   return (
     <div className={styles.page}>
@@ -83,6 +99,24 @@ export default function HomePage() {
                 />
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Suggested For You */}
+      {hasCompletedOnboarding && (recommended.length > 0 || isLoadingRecs) && (
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Suggested For You</h2>
+          </div>
+          <div className={styles.recommendationList}>
+            {isLoadingRecs ? (
+              [...Array(5)].map((_, i) => <div key={i} className={styles.skeletonRow} />)
+            ) : (
+              recommended.slice(0, 10).map((track) => (
+                <TrackRow key={track.id} track={track} />
+              ))
+            )}
           </div>
         </section>
       )}

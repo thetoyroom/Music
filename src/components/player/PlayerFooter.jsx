@@ -11,7 +11,7 @@ import { useAppStore } from '../../store/appStore.js';
 import styles from './PlayerFooter.module.css';
 
 function formatTime(s) {
-  if (!s || !isFinite(s)) return '0:00';
+  if (s === undefined || s === null || !isFinite(s) || (s === 0 && !isFinite(s))) return '--:--';
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, '0')}`;
@@ -71,7 +71,7 @@ export function PlayerFooter() {
         <div className={styles.meta}>
           <button
             className={`${styles.trackTitle} truncate`}
-            onClick={() => navigate(`/album/${currentTrack.albumId}`)}
+            onClick={(e) => { e.stopPropagation(); currentTrack.albumId && navigate(`/album/${currentTrack.albumId}`); }}
             title={currentTrack.title}
           >
             {currentTrack.title}

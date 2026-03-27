@@ -10,7 +10,14 @@ export function Header() {
   const theme = useAppStore((s) => s.theme);
   const toggleTheme = useAppStore((s) => s.toggleTheme);
   const [query, setQuery] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isSearchPage = location.pathname === '/search';
 
@@ -30,12 +37,12 @@ export function Header() {
 
   return (
     <header className={styles.header}>
-      <NavLink to="/" className={styles.logo}>
-        STEQ<span>MUSIC</span>
-        <span className={styles.logoAccent}>■</span>
-      </NavLink>
-
-      {/* Search bar */}
+      {isMobile && (
+        <NavLink to="/" className={styles.logo}>
+          STEQ<span>MUSIC</span>
+          <span className={styles.logoAccent}>■</span>
+        </NavLink>
+      )}
       <div className={styles.searchWrap}>
         <SearchIcon size={17} />
         <input

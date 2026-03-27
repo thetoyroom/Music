@@ -223,8 +223,25 @@
 }
 
 .genreCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-4px);
+  filter: brightness(1.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.recommendationList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  padding: 16px;
+}
+
+.skeletonRow {
+  height: 60px;
+  background: var(--border);
+  opacity: 0.3;
+  animation: pulse 1.5s infinite;
 }
 
 /* ─ How it works ─────────────────────────────────────────── */

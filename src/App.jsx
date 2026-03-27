@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 // Providers & Engine
 import { ThemeProvider } from './components/providers/ThemeProvider.jsx';
@@ -21,6 +21,11 @@ import ArtistPage from './pages/ArtistPage.jsx';
 import LibraryPage from './pages/LibraryPage.jsx';
 import SettingsPage from './pages/SettingsPage.jsx';
 import NowPlayingScreen from './components/player/NowPlayingScreen.jsx';
+import StarterPage from './pages/StarterPage.jsx';
+
+import { useAppStore } from './store/appStore.js';
+
+import { DownloadBar } from './components/layout/DownloadBar.jsx';
 
 /**
  * AppShell handles the responsive layout breakpoints.
@@ -30,7 +35,11 @@ import NowPlayingScreen from './components/player/NowPlayingScreen.jsx';
 function AppShell() {
   const [init, setInit] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const hasCompletedOnboarding = useAppStore(s => s.hasCompletedOnboarding);
+  
   const isNowPlayingRoute = location.pathname === '/now-playing';
+  const isStarterRoute = location.pathname === '/starter';
 
   // Screen width observer for responsive rendering
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
@@ -51,6 +60,12 @@ function AppShell() {
     return () => audioEngine.destroy();
   }, []);
 
+  useEffect(() => {
+    if (init && !hasCompletedOnboarding && !isStarterRoute) {
+      navigate('/starter');
+    }
+  }, [init, hasCompletedOnboarding, isStarterRoute, navigate]);
+
   if (!init) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)' }}>
@@ -59,10 +74,15 @@ function AppShell() {
     );
   }
 
+  if (isStarterRoute) {
+    return <StarterPage />;
+  }
+
   // Mobile layout
   if (!isDesktop) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+        <DownloadBar />
         {!isNowPlayingRoute && <Header />}
         
         <main style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }} className="scrollbar-hide">
@@ -74,6 +94,7 @@ function AppShell() {
             <Route path="/library/*" element={<LibraryPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/now-playing" element={<NowPlayingScreen />} />
+            <Route path="/starter" element={<StarterPage />} />
           </Routes>
         </main>
         
@@ -89,7 +110,8 @@ function AppShell() {
 
   // Desktop layout
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+      <DownloadBar />
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <Sidebar />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative' }}>
@@ -102,8 +124,8 @@ function AppShell() {
               <Route path="/artist/:id" element={<ArtistPage />} />
               <Route path="/library/*" element={<LibraryPage />} />
               <Route path="/settings" element={<SettingsPage />} />
-              {/* Desktop doesn't use the fullscreen NowPlaying route essentially, but we intercept it */}
               <Route path="/now-playing" element={<NowPlayingScreen />} />
+              <Route path="/starter" element={<StarterPage />} />
             </Routes>
           </main>
         </div>

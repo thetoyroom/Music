@@ -56,12 +56,31 @@
   padding: 8px;
 }
 
-.headerTitle {
-  font-size: 0.72rem;
+.logo {
+  display: flex;
+  align-items: center;
   font-weight: 900;
-  letter-spacing: 0.2em;
+  font-size: 1.1rem;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  gap: 2px;
+  text-decoration: none;
+}
+
+.logoAccent {
+  color: var(--accent);
+  font-size: 1.2rem;
+  margin-top: -2px;
+}
+
+.headerTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
   color: var(--text-primary);
   text-transform: uppercase;
+  opacity: 0.8;
 }
 
 .main {
@@ -147,7 +166,6 @@
 }
 
 .artist {
-  font-size: 1.25rem;
   font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;

@@ -65,8 +65,8 @@ export async function search(query, limit = 20) {
   ]);
   return {
     tracks: tracksRes?.data?.items ?? tracksRes?.tracks?.items ?? tracksRes?.items ?? [],
-    albums: albumsRes?.data?.items ?? albumsRes?.albums?.items ?? albumsRes?.items ?? [],
-    artists: artistsRes?.data?.items ?? artistsRes?.artists?.items ?? artistsRes?.items ?? []
+    albums: albumsRes?.data?.albums?.items ?? albumsRes?.data?.items ?? albumsRes?.albums?.items ?? albumsRes?.items ?? [],
+    artists: artistsRes?.data?.artists?.items ?? artistsRes?.data?.items ?? artistsRes?.artists?.items ?? artistsRes?.items ?? []
   };
 }
 
@@ -151,6 +151,7 @@ export async function getArtistAlbums(id, limit = 20) {
   const res = await apiFetch(`/artist/?f=${id}&skip_tracks=true&limit=${limit}`).catch(() => null);
   const data = res?.data ?? res;
   let albums = data?.albums ?? (Array.isArray(data) ? data : (data?.items ?? []));
+  if (!Array.isArray(albums)) albums = albums ? [albums] : [];
   return albums.map(i => i.item ?? i);
 }
 
@@ -272,7 +273,7 @@ export function normalizeTrack(raw) {
     artist: Array.isArray(raw.artists)
       ? raw.artists.map((a) => a.name).join(', ')
       : (raw.artist?.name ?? raw.artistName ?? 'Unknown Artist'),
-    artistId: Array.isArray(raw.artists) ? raw.artists[0]?.id : raw.artist?.id,
+    artistId: Array.isArray(raw.artists) ? raw.artists[0]?.id : (raw.artist?.id ?? raw.artistId),
     album: raw.album?.title ?? raw.albumTitle ?? '',
     albumId: raw.album?.id ?? raw.albumId,
     duration: raw.duration ?? 0,

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { usePlayerStore } from '../../store/playerStore.js';
 import { useAppStore } from '../../store/appStore.js';
+import { getStreamData } from '../../api/monochrome.js';
 import { PlayIcon, PauseIcon, HeartIcon, DotsIcon, DownloadIcon } from '../Icons.jsx';
 import styles from './TrackRow.module.css';
 
@@ -17,6 +18,8 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
   const isLiked = useAppStore((s) => s.isLiked(track.id));
   const toggleLike = useAppStore((s) => s.toggleLike);
   const addRecentlyPlayed = useAppStore((s) => s.addRecentlyPlayed);
+  const addDownloadStore = useAppStore((s) => s.addDownload);
+  const updateDownloadProgress = useAppStore((s) => s.updateDownloadProgress);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -33,11 +36,53 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
     }
   };
 
-  const handleDownload = (e) => {
+  const handleDownload = async (e) => {
     e.stopPropagation();
-    // In a real app, this would trigger a download. For now, we'll log it.
-    console.log('[Download] Triggered for:', track.title);
-    alert(`Downloading ${track.title}...`);
+    const id = `dl_${Date.now()}`;
+    addDownloadStore(id, track.title);
+    
+    try {
+      const streamData = await getStreamData(track.id);
+      if (!streamData?.url) throw new Error('No download URL found');
+
+      const response = await fetch(streamData.url);
+      if (!response.ok) throw new Error('Download failed');
+
+      const contentLength = response.headers.get('content-length');
+      const total = parseInt(contentLength, 10);
+      let loaded = 0;
+
+      const reader = response.body.getReader();
+      const chunks = [];
+      
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        loaded += value.length;
+        if (total) {
+          updateDownloadProgress(id, Math.round((loaded / total) * 100));
+        } else {
+          // Fallback if no content-length
+          updateDownloadProgress(id, Math.min(99, Math.round((loaded / 5000000) * 100)));
+        }
+      }
+
+      const blob = new Blob(chunks);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${track.artist} - ${track.title}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      updateDownloadProgress(id, 100);
+    } catch (err) {
+      console.error('Download error:', err);
+      updateDownloadProgress(id, 0); // Reset or show error
+    }
   };
 
   const handleMenuClick = (e) => {
@@ -145,6 +190,7 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
             <div className={styles.menu} onMouseLeave={() => setMenuOpen(false)}>
               <button onClick={(e) => { e.stopPropagation(); addToQueue(track); setMenuOpen(false); }}>Add to Queue</button>
               <button onClick={(e) => { e.stopPropagation(); toggleLike(track); setMenuOpen(false); }}>{isLiked ? 'Unlike' : 'Like'}</button>
+              <button onClick={(e) => { e.stopPropagation(); /* Add to Playlist logic placeholder */ setMenuOpen(false); }}>Add to Playlist</button>
               <button onClick={(e) => { e.stopPropagation(); navigate(`/album/${track.albumId}`); }}>View Album</button>
               <button onClick={handleDownload}>Download</button>
             </div>

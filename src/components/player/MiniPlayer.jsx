@@ -7,7 +7,7 @@ import { useAppStore } from '../../store/appStore.js';
 import styles from './MiniPlayer.module.css';
 
 function formatTime(s) {
-  if (!s || !isFinite(s)) return '0:00';
+  if (s === undefined || s === null || !isFinite(s) || (s === 0 && !isFinite(s))) return '--:--';
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, '0')}`;
@@ -46,13 +46,23 @@ export function MiniPlayer() {
         </button>
 
         {/* Meta */}
-        <button
-          className={styles.meta}
-          onClick={(e) => { e.stopPropagation(); navigate('/now-playing'); }}
-        >
-          <span className={`${styles.title} truncate`}>{currentTrack.title}</span>
-          <span className={`${styles.artist} truncate`}>{currentTrack.artist}</span>
-        </button>
+        <div className={styles.meta}>
+          <button 
+            className={`${styles.title} truncate`}
+            onClick={(e) => { e.stopPropagation(); navigate('/now-playing'); }}
+          >
+            {currentTrack.title}
+          </button>
+          <button 
+            className={`${styles.artist} truncate`}
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              if (currentTrack.artistId) navigate(`/artist/${currentTrack.artistId}`);
+            }}
+          >
+            {currentTrack.artist}
+          </button>
+        </div>
 
         {/* Controls */}
         <div className={styles.controls} onClick={(e) => e.stopPropagation()}>

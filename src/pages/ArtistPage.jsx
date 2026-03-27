@@ -23,17 +23,29 @@ export default function ArtistPage() {
     if (!id) return;
     setLoading(true);
     setError(null);
-    Promise.all([getArtist(id), getArtistTopTracks(id), getArtistAlbums(id)])
-      .then(([artistData, tracksData, albumsData]) => {
-        setArtist(normalizeArtist(artistData));
-        const t = (tracksData?.items ?? tracksData ?? []).map(normalizeTrack).filter(Boolean);
-        setTracks(t);
-        const a = (albumsData?.items ?? albumsData ?? []).map(normalizeAlbum).filter(Boolean);
-        setAlbums(a);
+    
+    // Fetch artist info first to show header ASAP
+    getArtist(id)
+      .then(data => {
+        setArtist(normalizeArtist(data));
+        setLoading(false); // Header hidden behind this, but we want to show it now
+        
+        // Then fetch deeper data
+        return Promise.all([getArtistTopTracks(id), getArtistAlbums(id)]);
       })
-      .catch((e) => setError(e.message))
+      .then(([tracksData, albumsData]) => {
+        const rawTracks = tracksData?.items ?? tracksData ?? [];
+        setTracks(Array.isArray(rawTracks) ? rawTracks.map(normalizeTrack).filter(Boolean) : []);
+        
+        const rawAlbums = albumsData?.items ?? albumsData ?? [];
+        setAlbums(Array.isArray(rawAlbums) ? rawAlbums.map(normalizeAlbum).filter(Boolean) : []);
+      })
+      .catch((e) => {
+        if (!artist) setError(e.message);
+        console.error('Artist Page load error:', e);
+      })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, artist?.id]);
 
   if (loading) return <div className={styles.load}><div className={styles.spinner} /></div>;
   if (error) return <div className={styles.err}>⚠ {error}</div>;
@@ -41,7 +53,11 @@ export default function ArtistPage() {
 
   return (
     <div className={styles.page}>
-      <button className={styles.back} onClick={() => navigate(-1)}>
+      <button className={styles.back} onClick={() => {
+        // If we came from Now Playing, go back to where we WERE before Now Playing if possible
+        // For now, -1 is fine, but maybe specifically handle /now-playing
+        navigate(-1);
+      }}>
         <ChevronLeftIcon size={14} /> BACK
       </button>
 
