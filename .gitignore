@@ -19,3 +19,12 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Designs & Assets
+MusicAppDesigns/
+
+# Bot & Tools
+.gemini/
+.agents/
+.agent/
+brain/
