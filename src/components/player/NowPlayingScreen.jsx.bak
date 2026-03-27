@@ -7,7 +7,7 @@ import { getLyrics } from '../../api/monochrome.js';
 import {
   ChevronLeftIcon, PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, Repeat1Icon, HeartIcon, SpinnerIcon, DotsIcon,
-  LyricsIcon, DownloadIcon, PlusIcon, LibraryIcon, QueueIcon, XIcon, DragHandleIcon
+  LyricsIcon, DownloadIcon, PlusIcon, LibraryIcon
 } from '../Icons.jsx';
 import { downloadTrack } from '../../utils/download.js';
 import styles from './NowPlayingScreen.module.css';
@@ -25,7 +25,7 @@ export default function NowPlayingScreen() {
     currentTrack, isPlaying, isLoading, progress, duration,
     shuffle, repeat, lyrics,
     setIsPlaying, toggleShuffle, toggleRepeat, next, prev, setLyrics,
-    addToQueueEnd, queue, currentTrackIndex, setQueue
+    addToQueueEnd
   } = usePlayerStore();
   
   const addDownload = useAppStore((s) => s.addDownload);
@@ -38,8 +38,6 @@ export default function NowPlayingScreen() {
   const lyricsListRef = useRef(null);
   
   const [showLyricsMobile, setShowLyricsMobile] = useState(false);
-  const [showLyricsDesktop, setShowLyricsDesktop] = useState(true);
-  const [viewMode, setViewMode] = useState('art'); // 'art' or 'queue'
   const checkIsDesktop = () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -156,13 +154,14 @@ export default function NowPlayingScreen() {
         )}
         <span className={styles.headerTitle}>{isDesktop ? 'NOW PLAYING' : ''}</span>
         <div className={styles.headerActions}>
-          <button 
-            className={`${styles.lyricsToggle} ${(isDesktop ? showLyricsDesktop : showLyricsMobile) ? styles.lyricsToggleActive : ''}`}
-            onClick={() => isDesktop ? setShowLyricsDesktop(!showLyricsDesktop) : setShowLyricsMobile(!showLyricsMobile)}
-            title="Toggle Lyrics"
-          >
-            <LyricsIcon size={20} />
-          </button>
+          {!isDesktop && (
+            <button 
+              className={`${styles.lyricsToggle} ${showLyricsMobile ? styles.lyricsToggleActive : ''}`}
+              onClick={() => setShowLyricsMobile(!showLyricsMobile)}
+            >
+              <LyricsIcon size={20} />
+            </button>
+          )}
           <button 
             className={styles.menuBtn} 
             aria-label="Options"
@@ -190,36 +189,11 @@ export default function NowPlayingScreen() {
       <main className={`${styles.main} ${isDesktop ? styles.desktopMain : ''}`}>
         {/* Left Side: Art + Primary Info (Mobile hides this if lyrics open) */}
         <section className={`${styles.primarySection} ${showLyricsMobile ? styles.hideMobile : ''}`}>
-          <div className={styles.mainVisual}>
-            {viewMode === 'art' ? (
-              <div className={styles.artWrap}>
-                {currentTrack.coverUrl ? (
-                  <img src={currentTrack.coverUrl} alt={currentTrack.title} className={styles.art} />
-                ) : (
-                  <div className={styles.artFallback} />
-                )}
-              </div>
+          <div className={styles.artWrap}>
+            {currentTrack.coverUrl ? (
+              <img src={currentTrack.coverUrl} alt={currentTrack.title} className={styles.art} />
             ) : (
-              <div className={styles.queueWrap}>
-                <div className={styles.queueHeader}>
-                  <h3>UP NEXT</h3>
-                  <button onClick={() => setViewMode('art')}><XIcon size={18} /></button>
-                </div>
-                <div className={styles.queueScroll}>
-                  {queue.slice(currentTrackIndex + 1).map((track, i) => (
-                    <div key={track.id + i} className={styles.queueItem}>
-                      <img src={track.coverUrl} alt="" />
-                      <div className={styles.queueItemInfo}>
-                        <p>{track.title}</p>
-                        <span>{track.artist}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {queue.length <= currentTrackIndex + 1 && (
-                    <p className={styles.queueEmpty}>QUEUE ENDS HERE</p>
-                  )}
-                </div>
-              </div>
+              <div className={styles.artFallback} />
             )}
           </div>
 
@@ -227,21 +201,12 @@ export default function NowPlayingScreen() {
             <div className={styles.metaRow}>
               <div className={styles.titles}>
                 <h1 className={`${styles.title} truncate`}>{currentTrack.title}</h1>
-                <div className={styles.artistRow}>
-                  <button 
-                    className={`${styles.artist} truncate`}
-                    onClick={() => currentTrack.artistId && navigate(`/artist/${currentTrack.artistId}`)}
-                  >
-                    {currentTrack.artist}
-                  </button>
-                  <button 
-                    className={`${styles.viewToggle} ${viewMode === 'queue' ? styles.viewToggleActive : ''}`}
-                    onClick={() => setViewMode(viewMode === 'queue' ? 'art' : 'queue')}
-                    title="Toggle Queue"
-                  >
-                    <QueueIcon size={16} />
-                  </button>
-                </div>
+                <button 
+                  className={`${styles.artist} truncate`}
+                  onClick={() => currentTrack.artistId && navigate(`/artist/${currentTrack.artistId}`)}
+                >
+                  {currentTrack.artist}
+                </button>
               </div>
               <button
                 className={`${styles.likeBtn} ${isLiked ? styles.liked : ''}`}
@@ -304,20 +269,18 @@ export default function NowPlayingScreen() {
         </section>
 
         {/* Right Side: Lyrics (Desktop always shows, Mobile toggles) */}
-        {(isDesktop ? showLyricsDesktop : showLyricsMobile) && (
-          <section className={styles.lyricsSection}>
-            {renderLyrics()}
-            
-            {!isDesktop && (
-              <button 
-                className={styles.lyricsCloseMobile}
-                onClick={() => setShowLyricsMobile(false)}
-              >
-                CLOSE LYRICS
-              </button>
-            )}
-          </section>
-        )}
+        <section className={`${styles.lyricsSection} ${!showLyricsMobile && !isDesktop ? styles.hideMobile : ''}`}>
+          {renderLyrics()}
+          
+          {showLyricsMobile && (
+            <button 
+              className={styles.lyricsCloseMobile}
+              onClick={() => setShowLyricsMobile(false)}
+            >
+              CLOSE LYRICS
+            </button>
+          )}
+        </section>
       </main>
     </div>
   );
