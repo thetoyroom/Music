@@ -27,9 +27,20 @@ export const DownloadBar = () => {
           <div className={styles.islandContent}>
             <div className={styles.islandInfo}>
               <span className={styles.islandFilename}>{d.filename}</span>
-              <span className={styles.islandStatus}>
-                {d.status === 'completed' ? '✓ DONE' : `${Math.round(d.progress)}%`}
-              </span>
+              <div className={styles.islandActions}>
+                <span className={styles.islandStatus}>
+                  {d.status === 'completed' ? '✓ DONE' : `${Math.round(d.progress)}%`}
+                </span>
+                {d.status !== 'completed' && (
+                  <button 
+                    className={styles.cancelButton} 
+                    onClick={() => removeDownload(d.id)}
+                    title="Cancel Download"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
             <div className={styles.islandProgressTrack}>
               <div 

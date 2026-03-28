@@ -4,13 +4,15 @@ import { usePlayerStore } from '../../store/playerStore.js';
 import { useAppStore } from '../../store/appStore.js';
 import { audioEngine } from '../../engine/AudioEngine.js';
 import { getLyrics } from '../../api/monochrome.js';
+import { recommendationService } from '../../services/recommendationService.js';
 import {
-  ChevronLeftIcon, PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, Repeat1Icon, HeartIcon, SpinnerIcon, DotsIcon,
-  LyricsIcon, DownloadIcon, PlusIcon, LibraryIcon, QueueIcon, XIcon, DragHandleIcon
+  LyricsIcon, DownloadIcon, PlusIcon, LibraryIcon, QueueIcon, XIcon, DragHandleIcon, TrashIcon,
+  ChevronLeftIcon, SkipPrevIcon, SkipNextIcon, PlayIcon, PauseIcon
 } from '../Icons.jsx';
-import { downloadTrack } from '../../utils/download.js';
+import { motion, Reorder, AnimatePresence } from 'framer-motion';
 import styles from './NowPlayingScreen.module.css';
+import { PlaylistSelector } from './PlaylistSelector.jsx';
 
 function formatTime(s) {
   if (!s || !isFinite(s)) return '0:00';
@@ -25,7 +27,7 @@ export default function NowPlayingScreen() {
     currentTrack, isPlaying, isLoading, progress, duration,
     shuffle, repeat, lyrics,
     setIsPlaying, toggleShuffle, toggleRepeat, next, prev, setLyrics,
-    addToQueueEnd, queue, currentTrackIndex, setQueue
+    addToQueueEnd, queue, queueIndex, setQueue, reorderQueue, removeFromQueue, jumpToQueueIndex
   } = usePlayerStore();
   
   const addDownload = useAppStore((s) => s.addDownload);
@@ -40,6 +42,7 @@ export default function NowPlayingScreen() {
   const [showLyricsMobile, setShowLyricsMobile] = useState(false);
   const [showLyricsDesktop, setShowLyricsDesktop] = useState(true);
   const [viewMode, setViewMode] = useState('art'); // 'art' or 'queue'
+  const [showPlaylist, setShowPlaylist] = useState(false);
   const checkIsDesktop = () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -90,9 +93,19 @@ export default function NowPlayingScreen() {
     }
   }, [activeLineIndex]);
 
+  // Redirect if no track
+  useEffect(() => {
+    if (!currentTrack) {
+      navigate(-1);
+    }
+  }, [currentTrack, navigate]);
+
   if (!currentTrack) {
-    navigate(-1);
-    return null;
+    return (
+      <div className={styles.screen}>
+         <div className={styles.lyricsPlaceholder}>LOADING...</div>
+      </div>
+    );
   }
 
   const handleProgressClick = (e) => {
@@ -179,8 +192,34 @@ export default function NowPlayingScreen() {
               <button onClick={() => { addToQueueEnd(currentTrack); setMenuOpen(false); }}>
                 <PlusIcon size={18} /> ADD TO QUEUE
               </button>
-              <button onClick={() => { setMenuOpen(false); }}>
+              <button onClick={() => { setMenuOpen(false); setShowPlaylist(true); }}>
                 <LibraryIcon size={18} /> ADD TO PLAYLIST
+              </button>
+              <div className={styles.menuDivider} />
+              <button onClick={() => { 
+                if (currentTrack.albumId) navigate(`/album/${currentTrack.albumId}`);
+                setMenuOpen(false);
+              }}>
+                <LibraryIcon size={18} /> VIEW ALBUM
+              </button>
+              <button onClick={() => { 
+                if (currentTrack.artistId) navigate(`/artist/${currentTrack.artistId}`);
+                setMenuOpen(false);
+              }}>
+                <LibraryIcon size={18} /> VIEW ARTIST
+              </button>
+              <button onClick={async () => { 
+                setMenuOpen(false);
+                try {
+                  const radioTracks = await recommendationService.getTrackRadio(currentTrack);
+                  if (radioTracks.length > 0) {
+                    setQueue(radioTracks, 0);
+                  }
+                } catch (e) {
+                  console.error('Track radio failed', e);
+                }
+              }}>
+                <ShuffleIcon size={18} /> TRACK RADIO
               </button>
             </div>
           )}
@@ -189,7 +228,7 @@ export default function NowPlayingScreen() {
 
       <main className={`${styles.main} ${isDesktop ? styles.desktopMain : ''}`}>
         {/* Left Side: Art + Primary Info (Mobile hides this if lyrics open) */}
-        <section className={`${styles.primarySection} ${showLyricsMobile ? styles.hideMobile : ''} ${isDesktop && !(isDesktop ? showLyricsDesktop : showLyricsMobile) ? styles.centered : ''}`}>
+        <section className={`${styles.primarySection} ${showLyricsMobile ? styles.hideMobile : ''}`}>
           <div className={styles.mainVisual}>
             {viewMode === 'art' ? (
               <div className={styles.artWrap}>
@@ -202,62 +241,59 @@ export default function NowPlayingScreen() {
             ) : (
               <div className={styles.queueWrap}>
                 <div className={styles.queueHeader}>
-                  <h3>UP NEXT</h3>
+                  <h3>UP NEXT ({Math.max(0, queue.length - (queueIndex + 1))})</h3>
                   <button onClick={() => setViewMode('art')}><XIcon size={18} /></button>
                 </div>
-                <div className={styles.queueScroll}>
-                  {queue.slice(currentTrackIndex + 1).map((track, i) => {
-                    const actualIndex = currentTrackIndex + 1 + i;
-                    return (
-                      <div 
-                        key={track.id + i} 
-                        className={styles.queueItem}
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData('text/plain', actualIndex);
-                          e.currentTarget.classList.add(styles.dragging);
-                        }}
-                        onDragEnd={(e) => {
-                          e.currentTarget.classList.remove(styles.dragging);
-                        }}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                          if (isNaN(fromIndex) || fromIndex === actualIndex) return;
-                          const newQueue = [...queue];
-                          const [removed] = newQueue.splice(fromIndex, 1);
-                          newQueue.splice(actualIndex, 0, removed);
-                          setQueue(newQueue);
-                        }}
-                        onClick={() => audioEngine.playTrack(track, queue, actualIndex)}
-                      >
-                        <div className={styles.dragHandle}>
-                          <DragHandleIcon size={14} />
-                        </div>
-                        <img src={track.coverUrl} alt="" />
-                        <div className={styles.queueItemInfo}>
-                          <p>{track.title}</p>
-                          <span>{track.artist}</span>
-                        </div>
-                        <button 
-                          className={styles.removeBtn}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const newQueue = [...queue];
-                            newQueue.splice(actualIndex, 1);
-                            setQueue(newQueue);
-                          }}
+                
+                <Reorder.Group 
+                  axis="y" 
+                  values={queue} 
+                  onReorder={reorderQueue}
+                  className={styles.queueScroll}
+                >
+                  <AnimatePresence initial={false}>
+                    {queue.map((track, i) => {
+                      const isCurrent = i === queueIndex;
+                      const isPast = i < queueIndex;
+                      
+                      return (
+                        <Reorder.Item 
+                          key={track.id + i} 
+                          value={track}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          className={`${styles.queueItem} ${isCurrent ? styles.queueActive : ''} ${isPast ? styles.queuePast : ''}`}
                         >
-                          <XIcon size={16} />
-                        </button>
-                      </div>
-                    );
-                  })}
-                  {queue.length <= currentTrackIndex + 1 && (
-                    <p className={styles.queueEmpty}>QUEUE ENDS HERE</p>
+                          <div className={styles.dragHandle}>
+                            <DragHandleIcon size={16} />
+                          </div>
+                          
+                          <div className={styles.queueMain} onClick={() => jumpToQueueIndex(i)}>
+                            <img src={track.coverUrl} alt="" className={styles.queueArt} />
+                            <div className={styles.queueItemInfo}>
+                              <p>{track.title}</p>
+                              <span>{track.artist}</span>
+                            </div>
+                          </div>
+                          
+                          {!isCurrent && (
+                            <button 
+                              className={styles.queueDelete}
+                              onClick={(e) => { e.stopPropagation(); removeFromQueue(i); }}
+                            >
+                              <TrashIcon size={16} />
+                            </button>
+                          )}
+                        </Reorder.Item>
+                      );
+                    })}
+                  </AnimatePresence>
+                  
+                  {queue.length === 0 && (
+                    <p className={styles.queueEmpty}>QUEUE IS EMPTY</p>
                   )}
-                </div>
+                </Reorder.Group>
               </div>
             )}
           </div>
@@ -324,7 +360,10 @@ export default function NowPlayingScreen() {
             >
               <ShuffleIcon size={22} />
             </button>
-            <button className={styles.ctrlBtn} onClick={prev}>
+            <button className={styles.ctrlBtn} onClick={() => {
+              if (progress > 3 || queueIndex === 0) audioEngine.seek(0);
+              else prev();
+            }}>
               <SkipPrevIcon size={36} />
             </button>
             <button className={styles.playBtnBrutalist} onClick={() => setIsPlaying(!isPlaying)}>
@@ -358,6 +397,8 @@ export default function NowPlayingScreen() {
           </section>
         )}
       </main>
+
+      {showPlaylist && <PlaylistSelector track={currentTrack} onClose={() => setShowPlaylist(false)} />}
     </div>
   );
 }

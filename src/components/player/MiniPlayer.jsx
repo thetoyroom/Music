@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePlayerStore } from '../../store/playerStore.js';
 import { audioEngine } from '../../engine/AudioEngine.js';
-import { PlayIcon, PauseIcon, HeartIcon, SpinnerIcon, SkipNextIcon, SkipPrevIcon, PlusSquareIcon } from '../Icons.jsx';
-import { QueueDrawer } from './QueueDrawer.jsx';
+import { PlayIcon, PauseIcon, HeartIcon, SpinnerIcon, SkipNextIcon, SkipPrevIcon, QueueIcon, PlusIcon } from '../Icons.jsx';
 import { useAppStore } from '../../store/appStore.js';
+import { QueueDrawer } from './QueueDrawer.jsx';
+import { PlaylistSelector } from './PlaylistSelector.jsx';
 import styles from './MiniPlayer.module.css';
 
 function formatTime(s) {
@@ -15,96 +16,112 @@ function formatTime(s) {
 }
 
 export function MiniPlayer() {
-  const { 
-    currentTrack, isPlaying, isLoading, progress, duration, 
-    setIsPlaying, next, prev 
-  } = usePlayerStore();
-  const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const { currentTrack, isPlaying, isLoading, progress, duration, setIsPlaying, next, prev } = usePlayerStore();
   const isLiked = useAppStore((s) => s.isLiked(currentTrack?.id));
   const toggleLike = useAppStore((s) => s.toggleLike);
   const navigate = useNavigate();
 
-  if (!currentTrack) return null;
+  const [showQueue, setShowQueue] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
+
+  if (!currentTrack || !currentTrack.id) return null;
 
   const pct = duration > 0 ? (progress / duration) * 100 : 0;
 
   return (
-    <div className={styles.container}>
-      {/* Progress strip at top */}
-      <div className={styles.strip}>
-        <div className={styles.stripFill} style={{ width: `${pct}%` }} />
-      </div>
+    <>
+      <div className={styles.container}>
+        {/* Progress strip at top */}
+        <div className={styles.strip}>
+          <div className={styles.stripFill} style={{ width: `${pct}%` }} />
+        </div>
 
-      {/* Content */}
-      <div className={styles.inner} onClick={() => navigate('/now-playing')} style={{ cursor: 'pointer' }}>
-        {/* Artwork */}
-        <button
-          className={styles.artworkBtn}
-          onClick={(e) => { e.stopPropagation(); navigate('/now-playing'); }}
-          aria-label="Now playing"
-        >
-          {currentTrack.coverUrl ? (
-            <img src={currentTrack.coverUrl} alt={currentTrack.title} className={styles.artwork} />
-          ) : (
-            <div className={styles.artworkFallback} />
-          )}
-        </button>
-
-        {/* Meta */}
-        <div className={styles.meta}>
-          <button 
-            className={`${styles.title} truncate`}
+        {/* Content */}
+        <div className={styles.inner} onClick={() => navigate('/now-playing')} style={{ cursor: 'pointer' }}>
+          {/* Artwork */}
+          <button
+            className={styles.artworkBtn}
             onClick={(e) => { e.stopPropagation(); navigate('/now-playing'); }}
+            aria-label="Now playing"
           >
-            {currentTrack.title}
-          </button>
-          <button 
-            className={`${styles.artist} truncate`}
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              if (currentTrack.artistId) navigate(`/artist/${currentTrack.artistId}`);
-            }}
-          >
-            {currentTrack.artist}
-          </button>
-        </div>
-
-        {/* Controls */}
-        <div className={styles.controls} onClick={(e) => e.stopPropagation()}>
-          <button
-            className={`${styles.iconBtn} ${isLiked ? styles.liked : ''}`}
-            onClick={(e) => { e.stopPropagation(); toggleLike(currentTrack); }}
-            aria-label="Like"
-          >
-            <HeartIcon size={20} filled={isLiked} />
-          </button>
-          
-          <button className={styles.iconBtn} onClick={prev} aria-label="Previous">
-            <SkipPrevIcon size={18} />
+            {currentTrack.coverUrl ? (
+              <img src={currentTrack.coverUrl} alt={currentTrack.title} className={styles.artwork} />
+            ) : (
+              <div className={styles.artworkFallback} />
+            )}
           </button>
 
-          <button
-            className={styles.playBtn}
-            onClick={() => setIsPlaying(!isPlaying)}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isLoading ? <SpinnerIcon size={22} /> : isPlaying ? <PauseIcon size={22} /> : <PlayIcon size={22} />}
-          </button>
+          {/* Meta */}
+          <div className={styles.meta}>
+            <button 
+              className={`${styles.title} truncate`}
+              onClick={(e) => { e.stopPropagation(); navigate('/now-playing'); }}
+            >
+              {currentTrack.title}
+            </button>
+            <button 
+              className={`${styles.artist} truncate`}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                if (currentTrack.artistId) navigate(`/artist/${currentTrack.artistId}`);
+              }}
+            >
+              {currentTrack.artist}
+            </button>
+          </div>
 
-          <button className={styles.iconBtn} onClick={next} aria-label="Next">
-            <SkipNextIcon size={18} />
-          </button>
+          {/* Controls */}
+          <div className={styles.controls} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.iconBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                const st = usePlayerStore.getState();
+                if (progress > 3 || st.queueIndex === 0) audioEngine.seek(0);
+                else prev();
+              }}
+              aria-label="Previous"
+            >
+              <SkipPrevIcon size={20} />
+            </button>
 
-          <button 
-            className={styles.iconBtn}
-            onClick={() => setIsQueueOpen(!isQueueOpen)}
-            aria-label="Queue"
-          >
-            <PlusSquareIcon size={18} />
-          </button>
+            <button
+              className={styles.playBtn}
+              onClick={(e) => { e.stopPropagation(); setIsPlaying(!isPlaying); }}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
+            >
+              {isLoading ? <SpinnerIcon size={22} /> : isPlaying ? <PauseIcon size={22} /> : <PlayIcon size={22} />}
+            </button>
+
+            <button
+              className={styles.iconBtn}
+              onClick={(e) => { e.stopPropagation(); next(); }}
+              aria-label="Next"
+            >
+              <SkipNextIcon size={20} />
+            </button>
+
+            <button
+              className={styles.iconBtn}
+              onClick={(e) => { e.stopPropagation(); setShowPlaylist(true); }}
+              aria-label="Add to Playlist"
+            >
+              <PlusIcon size={20} />
+            </button>
+
+            <button
+              className={styles.iconBtn}
+              onClick={(e) => { e.stopPropagation(); setShowQueue(true); }}
+              aria-label="Queue"
+            >
+              <QueueIcon size={20} />
+            </button>
+          </div>
         </div>
       </div>
-      <QueueDrawer isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
-    </div>
+
+      <QueueDrawer isOpen={showQueue} onClose={() => setShowQueue(false)} />
+      {showPlaylist && <PlaylistSelector track={currentTrack} onClose={() => setShowPlaylist(false)} />}
+    </>
   );
 }

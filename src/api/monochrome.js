@@ -43,12 +43,21 @@ async function apiFetch(path, options = {}, isStream = false) {
     } catch (err) {
       clearTimeout(timeout);
       lastError = err;
+      
+      const isCORS = err.name === 'TypeError' && err.message === 'Failed to fetch';
+      const isAbort = err.name === 'AbortError';
+      
+      console.warn(`[API] Failed on ${base}${path}:`, 
+        isCORS ? 'CORS/Network error' : isAbort ? 'Timeout' : err.message);
+
       if (isStream) {
         instanceManager.markStreamFailed(base);
       } else {
         instanceManager.markApiFailed(base);
       }
-      console.warn(`[API] Failed on ${base}${path}:`, err.message);
+      
+      // Brief delay before next retry
+      await new Promise(r => setTimeout(r, 500));
     }
   }
 
@@ -176,6 +185,43 @@ export async function getMix(id) {
   return apiFetch(`/mix/${id}`);
 }
 
+export async function getTrackRadio(trackId) {
+  try {
+    // Try multiple possible radio endpoints as various instances have different logic
+    const endpoints = [
+      `/radio/track/?id=${trackId}&limit=50`,
+      `/track/radio/?id=${trackId}&limit=50`,
+      `/mix/${trackId}`
+    ];
+    
+    for (const ep of endpoints) {
+      try {
+        const res = await apiFetch(ep);
+        const data = res?.data ?? res;
+        const tracks = Array.isArray(data) ? data : (data?.items ?? []);
+        // Only return if we actually got a reasonable amount of tracks
+        if (tracks.length > 5) return normalizeTracks(tracks);
+      } catch (e) {
+        // Silently try next endpoint
+      }
+    }
+    
+    throw new Error('All radio endpoints failed or returned too few tracks');
+  } catch (err) {
+    console.warn(`[API] Track radio failed, trying artist fallback:`, err);
+    // If radio fails, get top tracks from the primary artist
+    const track = await getTrack(trackId);
+    if (track) {
+      const artistId = track.artist?.id || track.artistId;
+      if (artistId) {
+        const topTracks = await getArtistTopTracks(artistId, 50);
+        if (topTracks && topTracks.length > 0) return topTracks;
+      }
+    }
+    return [];
+  }
+}
+
 // ─── Artwork ─────────────────────────────────────────────────────────────────
 
 /**
@@ -209,12 +255,14 @@ export async function getNewReleases(limit = 20) {
 }
 
 // ─── Lyrics ──────────────────────────────────────────────────────────────────
+const lyricsCache = new Map();
 
 /**
  * Fetch synced lyrics from LRCLIB.
  */
 export async function getLyrics(track) {
   if (!track) return null;
+  if (lyricsCache.has(track.id)) return lyricsCache.get(track.id);
   
   try {
     // Clean up title and artist for better matching
@@ -233,11 +281,13 @@ export async function getLyrics(track) {
     
     const data = await res.json();
     if (data.syncedLyrics) {
-      return {
+      const lyrics = {
         synced: parseLRC(data.syncedLyrics),
         plain: data.plainLyrics || '',
         provider: 'LRCLIB'
       };
+      lyricsCache.set(track.id, lyrics);
+      return lyrics;
     }
   } catch (err) {
     console.warn('[Lyrics] Fetch failed:', err);
@@ -257,7 +307,9 @@ function parseLRC(lrc) {
       const min = parseInt(match[1]);
       const sec = parseFloat(match[2]);
       const text = match[3].trim();
-      result.push({ time: min * 60 + sec, text });
+      if (!isNaN(min) && !isNaN(sec)) {
+        result.push({ time: min * 60 + sec, text });
+      }
     }
   }
   return result;
@@ -267,6 +319,7 @@ function parseLRC(lrc) {
 
 export function normalizeTrack(raw) {
   if (!raw) return null;
+  const dur = parseFloat(raw.duration);
   return {
     id: raw.id ?? raw.tidalId,
     title: raw.title ?? 'Unknown Track',
@@ -276,7 +329,7 @@ export function normalizeTrack(raw) {
     artistId: Array.isArray(raw.artists) ? raw.artists[0]?.id : (raw.artist?.id ?? raw.artistId),
     album: raw.album?.title ?? raw.albumTitle ?? '',
     albumId: raw.album?.id ?? raw.albumId,
-    duration: raw.duration ?? 0,
+    duration: isFinite(dur) ? dur : 0,
     coverArt: raw.album?.cover ?? raw.cover ?? raw.image,
     coverUrl: getCoverUrl(raw.album?.cover ?? raw.cover ?? raw.image, 320),
     quality: raw.audioQuality ?? raw.quality,

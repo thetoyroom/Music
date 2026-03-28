@@ -46,5 +46,40 @@ export const recommendationService = {
       // Fallback to trending or something if needed
       return [];
     }
+  },
+
+  /**
+   * Generates a context-aware radio based on a single track.
+   */
+  async getTrackRadio(track) {
+    if (!track) return [];
+    
+    try {
+      const { getTrackRadio, normalizeTracks, getArtistTopTracks } = await import('../api/monochrome');
+      
+      let raw;
+      try {
+        raw = await getTrackRadio(track.id);
+      } catch (e) {
+        console.warn('[RecommendationService] Primary radio API failed, falling back to artist tracks');
+        // Fallback: Get top tracks for the artist
+        if (track.artistId) {
+          raw = await getArtistTopTracks(track.artistId, 50);
+        } else {
+          throw e;
+        }
+      }
+
+      const normalized = normalizeTracks(raw);
+      
+      // Ensure we don't return the seed track as the first item if we have others
+      const filtered = normalized.filter(t => t.id !== track.id);
+      
+      // Add the seed track at the start
+      return [track, ...filtered];
+    } catch (err) {
+      console.error('[RecommendationService] Failed to generate radio:', err);
+      return [track];
+    }
   }
 };

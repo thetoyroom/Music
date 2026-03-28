@@ -62,6 +62,36 @@
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
+  max-width: 150px;
+}
+
+.islandActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cancelButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.cancelButton:hover {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+  transform: scale(1.1);
 }
 
 .islandStatus {
@@ -91,5 +121,8 @@
   .island {
     min-width: 240px;
     padding: 10px 20px;
+  }
+  .islandFilename {
+    max-width: 100px;
   }
 }

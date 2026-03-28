@@ -56,14 +56,14 @@
   padding: 8px;
 }
 
-.logo {
+.logo, .logo span {
   display: flex;
   align-items: center;
   font-weight: 900;
   font-size: 1.1rem;
   letter-spacing: -0.04em;
   text-transform: uppercase;
-  color: #fff;
+  color: #000000 !important; /* Force black for contrast on mobile */
   gap: 2px;
   text-decoration: none;
 }
@@ -96,14 +96,13 @@
 }
 
 .desktopMain {
-  display: flex; /* Changed from grid to flex for easier centering transition */
-  justify-content: center;
-  gap: 60px;
-  align-items: center;
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: clamp(20px, 4vw, 80px);
+  align-items: center;
+  padding: 20px clamp(20px, 5vw, 80px);
+  overflow: hidden;
 }
 
 .primarySection {
@@ -111,15 +110,8 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  max-width: 600px; /* Keep it constrained */
-  justify-content: space-between;
+  justify-content: space-between; /* Spread elements if there's extra space */
   animation: fadeIn 0.4s ease;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.primarySection.centered {
-  flex: 0 1 600px;
-  margin: 0 auto;
 }
 
 .artWrap {
@@ -197,88 +189,75 @@
   flex: 1;
   overflow-y: auto;
   padding: 10px 0;
-  scrollbar-width: thin;
 }
 
 .queueItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--border-subtle);
-  transition: background 0.2s, opacity 0.2s, transform 0.2s;
-  cursor: pointer;
+  transition: background 0.2s;
+  background: var(--bg-surface);
   position: relative;
+  touch-action: none; /* Required for drag handle on mobile */
 }
 
 .queueItem:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.03);
 }
 
-.queueItem.dragging {
+.queueActive {
+  background: rgba(var(--accent-rgb), 0.1) !important;
+  border-left: 4px solid var(--accent);
+}
+
+.queueActive p {
+  color: var(--accent) !important;
+}
+
+.queuePast {
   opacity: 0.5;
-  background: var(--bg-surface-hover);
-  border: 2px dashed var(--accent);
 }
 
 .dragHandle {
-  flex: none;
-  cursor: grab;
-  color: var(--text-secondary);
   display: flex;
   align-items: center;
-  opacity: 0.3;
-  transition: opacity 0.2s;
-}
-
-.queueItem:hover .dragHandle {
-  opacity: 1;
-}
-
-.removeBtn {
-  margin-left: auto;
+  justify-content: center;
   color: var(--text-secondary);
-  opacity: 0;
-  transition: all 0.2s;
-  padding: 8px;
-  border-radius: 4px;
+  cursor: grab;
+  padding: 8px 4px;
 }
 
-.queueItem:hover .removeBtn {
-  opacity: 1;
+.dragHandle:active {
+  cursor: grabbing;
 }
 
-.removeBtn:hover {
-  background: rgba(255, 0, 0, 0.1);
-  color: #ff4444;
+.queueMain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  cursor: pointer;
 }
 
-.queueItem img {
-  width: 44px;
-  height: 44px;
+.queueArt {
+  width: 40px;
+  height: 40px;
   object-fit: cover;
   border: 1px solid #000;
-  flex: none;
+  flex-shrink: 0;
 }
 
-.queueItemInfo {
-  min-width: 0;
-}
-
-.queueItemInfo p {
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.queueItemInfo span {
-  font-size: 0.7rem;
+.queueDelete {
+  padding: 8px;
   color: var(--text-secondary);
-  font-weight: 600;
-  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.queueDelete:hover {
+  color: #ff4444;
 }
 
 .queueEmpty {
@@ -451,18 +430,11 @@
 /* --- Lyrics Section --- */
 
 .lyricsSection {
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  animation: slideInRight 0.5s ease;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.4s ease;
   overflow: hidden;
-}
-
-@keyframes slideInRight {
-  from { transform: translateX(30px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
 }
 
 .desktopMain .lyricsSection {
@@ -596,12 +568,14 @@
   .lyricLine { font-size: clamp(1.4rem, 4vw, 2.2rem); }
 }
 
-@media (max-height: 700px) and (max-width: 1023px) {
-  .artWrap {
-    max-width: 300px;
-    margin-bottom: 20px;
+@media (max-height: 670px) and (max-width: 1023px) {
+  .artWrap, .queueWrap {
+    max-height: 35vh;
   }
-  .info {
-    margin-bottom: 16px;
+  .title {
+    font-size: 1.2rem;
+  }
+  .main {
+    padding-top: 5px;
   }
 }

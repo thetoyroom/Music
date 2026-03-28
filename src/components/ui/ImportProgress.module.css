@@ -1,0 +1,170 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+.spinner {
+  color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.percentage {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--accent);
+}
+
+.progressTrack {
+  height: 8px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.progressFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.current {
+  background: var(--bg-base);
+  border: 2px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: var(--text-secondary);
+  letter-spacing: 0.2em;
+}
+
+.trackName {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artistName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.hint {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 8px;
+  opacity: 0.8;
+}
+
+.error {
+  color: #ff4444;
+  font-weight: 900;
+}
+
+.statusError {
+  color: #ff4444;
+  font-weight: 900;
+}
+
+.statusSuccess {
+  color: #00ff88;
+  font-weight: 900;
+}
+
+.percentageSuccess {
+  color: #00ff88;
+}
+
+.progressFillComplete {
+  background: #00ff88;
+  box-shadow: 0 0 15px #00ff88;
+}
+
+.progressFillError {
+  background: #ff4444;
+  box-shadow: 0 0 15px #ff4444;
+}
+
+.playlistHeader {
+  margin-bottom: -10px;
+}
+
+.playlistName {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 480px) {
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .percentage {
+    align-self: flex-end;
+    margin-top: -30px;
+  }
+  
+  .status {
+    font-size: 0.7rem;
+  }
+
+  .current {
+    padding: 12px;
+  }
+
+  .trackName {
+    font-size: 0.9rem;
+  }
+}
+
+.truncatedWarning {
+  background: rgba(255, 170, 0, 0.1);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  padding: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffaa00;
+  text-align: center;
+  line-height: 1.4;
+  margin: -10px 0;
+}

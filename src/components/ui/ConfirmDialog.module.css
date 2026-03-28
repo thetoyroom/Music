@@ -1,0 +1,117 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.dialog {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: #1a1a1a;
+  border: 4px solid var(--border);
+  padding: 32px;
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.message {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.cancelBtn {
+  background: none;
+  border: 4px solid transparent;
+  padding: 12px 24px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+  color: var(--text-primary);
+}
+
+.confirmBtn {
+  background: var(--accent);
+  border: 4px solid var(--accent);
+  padding: 12px 32px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 6px 6px 0 var(--border);
+}
+
+.confirmBtn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--border);
+}
+
+/* Themes */
+.danger .confirmBtn {
+  background: #ff4d4d;
+  border-color: #ff4d4d;
+}
+
+.danger .title {
+  color: #ff4d4d;
+}
+
+@media (max-width: 600px) {
+  .overlay {
+    align-items: flex-end; /* Bottom sheet feel */
+    padding: 0;
+  }
+
+  .dialog {
+    max-width: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 32px 24px 48px 24px; /* More bottom padding for safe area */
+    box-shadow: none;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .confirmBtn, .cancelBtn {
+    width: 100%;
+    text-align: center;
+  }
+}

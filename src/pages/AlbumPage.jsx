@@ -25,10 +25,15 @@ export default function AlbumPage() {
       .then(([albumData, tracksData]) => {
         setAlbum(normalizeAlbum(albumData));
         const items = tracksData?.items ?? tracksData?.tracks?.items ?? tracksData ?? [];
-        const normalized = items.map(normalizeTrack).filter(Boolean);
+        const normalized = Array.isArray(items) 
+          ? items.map(normalizeTrack).filter(Boolean)
+          : [];
         setTracks(normalized);
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => {
+        console.error('[AlbumPage] Error loading album:', e);
+        setError(e.message);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 

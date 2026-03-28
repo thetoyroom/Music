@@ -12,7 +12,18 @@
 }
 
 .row.noArtwork {
-  grid-template-columns: 32px 1fr auto;
+  grid-template-columns: 24px 1fr auto;
+}
+
+@media (max-width: 768px) {
+  .row {
+    grid-template-columns: 24px 40px 1fr auto;
+    gap: 8px;
+    padding: 6px 8px;
+  }
+  .row.noArtwork {
+    grid-template-columns: 24px 1fr auto;
+  }
 }
 
 .row:hover {
@@ -192,6 +203,19 @@
 .row:hover .iconBtn,
 .active .iconBtn {
   opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .iconBtn {
+    opacity: 1;
+    padding: 4px;
+  }
+  .actions {
+    gap: 4px;
+  }
+  .duration {
+    display: none; /* Hide duration on tiny screens to save space if needed, or keep it */
+  }
 }
 
 .iconBtn:hover {

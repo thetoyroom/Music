@@ -5,18 +5,21 @@ import { useState } from 'react';
 
 export function QueueDrawer({ isOpen, onClose }) {
   const { 
-    queue, queueIndex, jumpToQueueIndex, removeFromQueue, moveInQueue, currentTrack 
+    queue, queueIndex, jumpToQueueIndex, removeFromQueue, moveInQueue, currentTrack,
+    clearQueue 
   } = usePlayerStore();
 
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [showConfirmClear, setShowConfirmClear] = useState(false);
 
   if (!isOpen) return null;
 
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
+    // Required for some browsers to trigger drag
+    e.dataTransfer.setData("text/plain", index);
     e.dataTransfer.effectAllowed = "move";
-    // Set a ghost image or just let default happen
   };
 
   const handleDragOver = (e, index) => {
@@ -38,14 +41,39 @@ export function QueueDrawer({ isOpen, onClose }) {
     setDragOverIndex(null);
   };
 
+  const executeClear = () => {
+    clearQueue();
+    setShowConfirmClear(false);
+  };
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.drawer} onClick={e => e.stopPropagation()}>
         <header className={styles.header}>
           <h3>PLAY QUEUE ({queue.length})</h3>
-          <button className={styles.closeBtn} onClick={onClose}>
-            <XIcon size={20} />
-          </button>
+          <div className={styles.headerActions}>
+            {queue.length > 0 && (
+              !showConfirmClear ? (
+                <button 
+                  className={styles.clearBtn} 
+                  onClick={() => setShowConfirmClear(true)}
+                  title="Clear all tracks"
+                  id="btn-clear-queue"
+                >
+                  CLEAR
+                </button>
+              ) : (
+                <div className={styles.confirmActions}>
+                  <span className={styles.confirmText}>CLEAR ALL?</span>
+                  <button className={styles.confirmYes} onClick={executeClear} id="btn-confirm-clear">YES</button>
+                  <button className={styles.confirmNo} onClick={() => setShowConfirmClear(false)}>NO</button>
+                </div>
+              )
+            )}
+            <button className={styles.closeBtn} onClick={onClose}>
+              <XIcon size={20} />
+            </button>
+          </div>
         </header>
 
         <div className={styles.list}>

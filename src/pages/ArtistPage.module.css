@@ -8,6 +8,15 @@
 .back:hover { color: var(--text-primary); }
 
 .header { display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; align-items: flex-start; }
+
+@media (max-width: 600px) {
+  .header { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+  .picWrap { width: 180px; height: 180px; margin: 0 auto; }
+  .meta { align-items: center; width: 100%; text-align: center; }
+  .name { text-align: center; font-size: 2.2rem; }
+  .bio { text-align: center; margin: 0 auto; }
+  .playBtn { margin: 12px auto 0; }
+}
 .picWrap { width: 160px; height: 160px; flex-shrink: 0; border: 2px solid var(--border); overflow: hidden; }
 @media (min-width: 600px) { .picWrap { width: 200px; height: 200px; } }
 .pic { width: 100%; height: 100%; object-fit: cover; }

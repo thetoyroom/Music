@@ -56,11 +56,10 @@
 
 .meta {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  gap: 1px;
-  margin-right: 8px;
+  gap: 2px;
 }
 
 .title {
@@ -96,27 +95,22 @@
 .controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+@media (max-width: 380px) {
+  .controls { gap: 4px; }
+  .iconBtn { padding: 2px; }
 }
 
 .iconBtn {
   color: var(--text-secondary);
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+  padding: 4px;
+  transition: color 0.15s;
 }
 
-.iconBtn:hover {
-  color: var(--text-primary);
-}
-
-.iconBtn:active {
-  transform: scale(0.9);
-}
-
+.iconBtn:hover { color: var(--accent); }
 .liked { color: var(--accent) !important; }
 
 .playBtn {

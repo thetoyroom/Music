@@ -3,8 +3,10 @@ import { useState } from 'react';
 import { usePlayerStore } from '../../store/playerStore.js';
 import { useAppStore } from '../../store/appStore.js';
 import { getStreamData } from '../../api/monochrome.js';
+import { recommendationService } from '../../services/recommendationService.js';
 import { downloadTrack } from '../../utils/download.js';
 import { PlayIcon, PauseIcon, HeartIcon, DotsIcon, DownloadIcon } from '../Icons.jsx';
+import { PlaylistSelector } from '../player/PlaylistSelector.jsx';
 import styles from './TrackRow.module.css';
 
 function formatTime(s) {
@@ -23,6 +25,7 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
   const updateDownloadProgress = useAppStore((s) => s.updateDownloadProgress);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
 
   const isCurrent = currentTrack?.id === track.id;
   const isCurrentPlaying = isCurrent && isPlaying;
@@ -47,6 +50,19 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
     setMenuOpen(!menuOpen);
   };
 
+  const startTrackRadio = async (e) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+    try {
+      const radioTracks = await recommendationService.getTrackRadio(track);
+      if (radioTracks.length > 0) {
+        usePlayerStore.getState().playTrack(radioTracks[0], radioTracks, 0);
+      }
+    } catch (err) {
+      console.error('Failed to start track radio', err);
+    }
+  };
+
   return (
     <div
       className={`${styles.row} ${isCurrent ? styles.active : ''} ${!showArtwork ? styles.noArtwork : ''}`}
@@ -62,7 +78,9 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
           </span>
         ) : (
           <>
-            <span className={styles.indexNumber}>{index + 1}</span>
+            <span className={styles.indexNumber}>
+              {typeof index === 'number' ? index + 1 : '—'}
+            </span>
             <button className={styles.playBtn} onClick={handlePlay} aria-label="Play">
               <PlayIcon size={14} />
             </button>
@@ -143,14 +161,17 @@ export function TrackRow({ track, tracks, index, showArtwork = true, showAlbum =
           {menuOpen && (
             <div className={styles.menu} onMouseLeave={() => setMenuOpen(false)}>
               <button onClick={(e) => { e.stopPropagation(); addToQueue(track); setMenuOpen(false); }}>Add to Queue</button>
+              <button onClick={startTrackRadio}>Track Radio</button>
               <button onClick={(e) => { e.stopPropagation(); toggleLike(track); setMenuOpen(false); }}>{isLiked ? 'Unlike' : 'Like'}</button>
-              <button onClick={(e) => { e.stopPropagation(); /* Add to Playlist logic placeholder */ setMenuOpen(false); }}>Add to Playlist</button>
+              <button onClick={(e) => { e.stopPropagation(); setShowPlaylist(true); setMenuOpen(false); }}>Add to Playlist</button>
               <button onClick={(e) => { e.stopPropagation(); navigate(`/album/${track.albumId}`); }}>View Album</button>
               <button onClick={handleDownload}>Download</button>
             </div>
           )}
         </div>
       </div>
+
+      {showPlaylist && <PlaylistSelector track={track} onClose={() => setShowPlaylist(false)} />}
     </div>
   );
 }

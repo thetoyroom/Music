@@ -5,11 +5,21 @@ import { searchArtists, getArtistPictureUrl } from '../api/monochrome';
 import { 
   CheckIcon as Check, 
   SearchIcon as Search, 
-  SkipNextIcon as SkipForward 
+  SkipNextIcon as SkipForward,
+  GoogleIcon as Google,
+  MailIcon as Mail
 } from '../components/Icons';
 
-const Icons = { Check, Search, SkipForward };
+const Icons = { Check, Search, SkipForward, Google, Mail };
 import styles from './StarterPage.module.css';
+import { 
+  loginWithGoogle, 
+  loginWithEmail, 
+  signupWithEmail, 
+  onAuthChange 
+} from '../services/authService';
+import { db } from '../services/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 const GENRES = [
   'Techno / IDM', 'Hyperpop', 'Lo-Fi Jazz', 'Post-Punk', 'Ambient', 'UK Garage',
@@ -30,12 +40,51 @@ export default function StarterPage() {
   const navigate = useNavigate();
   const completeOnboarding = useAppStore(s => s.completeOnboarding);
   
-  const [step, setStep] = useState(1); // 1: Genres, 2: Artists, 3: Success
+  const [step, setStep] = useState(0); // 0: Auth, 1: Genres, 2: Artists, 3: Success
+  const [user, setUser] = useState(null);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedArtists, setSelectedArtists] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    return onAuthChange(async (u) => {
+      setUser(u);
+      if (u) {
+        console.log('[Starter] Auth detected:', u.uid);
+        // Add a timeout to Firestore check so it doesn't hang forever
+        const checkDoc = async () => {
+          const docRef = doc(db, 'users', u.uid);
+          const snap = await getDoc(docRef);
+          if (snap.exists() && snap.data().onboardingCompleted) {
+            completeOnboarding(snap.data().onboardingData || { genres: [], artists: [] });
+            navigate('/');
+            return true;
+          }
+          return false;
+        };
+
+        try {
+          // Race the Firestore check against a 2.5s timeout
+          const completed = await Promise.race([
+            checkDoc(),
+            new Promise(res => setTimeout(() => res(false), 2500))
+          ]);
+          if (!completed) setStep(1); // Proceed to onboarding
+        } catch (e) {
+          console.error('[Starter] Sync check error:', e);
+          setStep(1);
+        }
+      }
+    });
+  }, [completeOnboarding, navigate]);
 
   const toggleGenre = (genre) => {
     setSelectedGenres(prev => 
@@ -146,7 +195,85 @@ export default function StarterPage() {
              <button className={styles.skipBtn} onClick={() => { completeOnboarding({genres:[], artists:[]}); navigate('/'); }}>SKIP</button>
           </header>
 
-          {step === 1 ? (
+          {step === 0 ? (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2><span>00.</span> IDENTIFICATION</h2>
+                <span className={styles.hint}>Secure your stream preferences</span>
+              </div>
+              <div className={styles.authContainer}>
+                <button 
+                  className={styles.googleBtn} 
+                  onClick={async () => {
+                    setIsLoading(true);
+                    setAuthError('');
+                    console.log('[Starter] Initiating Google Login...');
+                    try { 
+                      const u = await loginWithGoogle(); 
+                      console.log('[Starter] Google Login Success:', u.uid);
+                      setUser(u);
+                      setStep(1); 
+                    } catch (e) { 
+                      console.error('[Starter] Google Login Error:', e);
+                      setAuthError(e.message); 
+                    }
+                    setIsLoading(false);
+                  }}
+                  disabled={isLoading}
+                >
+                  <Icons.Google size={20} />
+                  CONTINUE WITH GOOGLE
+                </button>
+
+                <div className={styles.divider}>
+                  <span>OR USE SONIC ID</span>
+                </div>
+
+                <div className={styles.form}>
+                  <div className={styles.inputGroup}>
+                    <input 
+                      type="email" 
+                      placeholder="EMAIL" 
+                      value={email} 
+                      onChange={e => setEmail(e.target.value)} 
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <input 
+                      type="password" 
+                      placeholder="PASSWORD" 
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)} 
+                    />
+                  </div>
+                  {authError && <div className={styles.error}>{authError}</div>}
+                  <button 
+                    className={styles.submitBtn}
+                    onClick={async () => {
+                      setIsLoading(true);
+                      setAuthError('');
+                      try {
+                        if (isLoginMode) await loginWithEmail(email, password);
+                        else await signupWithEmail(email, password);
+                      } catch (e) {
+                        setAuthError(e.message);
+                      }
+                      setIsLoading(false);
+                    }}
+                    disabled={isLoading || !email || !password}
+                  >
+                    {isLoading ? 'ESTABLISHING...' : (isLoginMode ? 'LOGIN' : 'CREATE ACCOUNT')}
+                  </button>
+                  <button 
+                    className={styles.toggleBtn}
+                    onClick={() => setIsLoginMode(!isLoginMode)}
+                  >
+                    {isLoginMode ? "DON'T HAVE AN ACCOUNT? SIGN UP" : "ALREADY HAVE AN ACCOUNT? LOGIN"}
+                  </button>
+                </div>
+              </div>
+            </section>
+          ) : step === 1 ? (
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h2><span>01.</span> CHOOSE GENRES</h2>

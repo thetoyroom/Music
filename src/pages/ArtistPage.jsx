@@ -73,10 +73,12 @@ export default function ArtistPage() {
         <div className={styles.meta}>
           <span className={styles.metaType}>ARTIST</span>
           <h1 className={styles.name}>{artist.name}</h1>
-          {artist.biography && (
+          {artist.biography ? (
             <p className={styles.bio}>{artist.biography.slice(0, 200)}{artist.biography.length > 200 ? '…' : ''}</p>
+          ) : (
+            <p className={styles.bio}>No biography available for this artist.</p>
           )}
-          {tracks.length > 0 && (
+          {tracks && tracks.length > 0 && (
             <button
               className={styles.playBtn}
               onClick={() => { setQueue(tracks, 0); addRecentlyPlayed(tracks[0]); }}
@@ -88,7 +90,7 @@ export default function ArtistPage() {
       </div>
 
       {/* Top Tracks */}
-      {tracks.length > 0 && (
+      {tracks && tracks.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Top Tracks</h2>
           <div className={styles.trackList}>

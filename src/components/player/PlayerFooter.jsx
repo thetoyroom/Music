@@ -6,7 +6,7 @@ import {
   PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, Repeat1Icon,
   VolumeIcon, VolumeMuteIcon, HeartIcon, SpinnerIcon,
-  PlusSquareIcon
+  PlusSquareIcon, PlusIcon, QueueIcon
 } from '../Icons.jsx';
 import { QueueDrawer } from './QueueDrawer.jsx';
 import { useAppStore } from '../../store/appStore.js';
@@ -33,6 +33,7 @@ export function PlayerFooter() {
   const isLiked = useAppStore((s) => s.isLiked(currentTrack?.id));
   const toggleLike = useAppStore((s) => s.toggleLike);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
   const progressRef = useRef(null);
 
   const handleProgressClick = useCallback((e) => {
@@ -88,13 +89,20 @@ export function PlayerFooter() {
           </button>
         </div>
 
-        <div className={styles.likeBtn}>
+        <div className={styles.trackActions}>
           <button
             onClick={(e) => { e.stopPropagation(); toggleLike(currentTrack); }}
-            className={isLiked ? styles.liked : ''}
+            className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
             aria-label="Like"
           >
             <HeartIcon size={18} filled={isLiked} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowPlaylist(true); }}
+            className={styles.actionBtn}
+            aria-label="Add to Playlist"
+          >
+            <PlusIcon size={18} />
           </button>
         </div>
       </div>
@@ -102,14 +110,23 @@ export function PlayerFooter() {
       {/* Controls */}
       <div className={styles.controls} onClick={(e) => e.stopPropagation()}>
         <button
-          className={`${styles.ctrlBtn} ${shuffle ? styles.ctrlActive : ''}`}
+          className={`${styles.ctrlBtn} ${styles.desktopOnly} ${shuffle ? styles.ctrlActive : ''}`}
           onClick={toggleShuffle}
           aria-label="Shuffle"
         >
           <ShuffleIcon size={16} />
         </button>
 
-        <button className={styles.ctrlBtn} onClick={prev} aria-label="Previous">
+        <button 
+          className={styles.ctrlBtn} 
+          onClick={(e) => {
+            e.stopPropagation();
+            const st = usePlayerStore.getState();
+            if (progress > 3 || st.queueIndex === 0) audioEngine.seek(0);
+            else prev();
+          }} 
+          aria-label="Previous"
+        >
           <SkipPrevIcon size={20} />
         </button>
 
@@ -133,7 +150,7 @@ export function PlayerFooter() {
         </button>
 
         <button
-          className={`${styles.ctrlBtn} ${repeat !== 'none' ? styles.ctrlActive : ''}`}
+          className={`${styles.ctrlBtn} ${styles.desktopOnly} ${repeat !== 'none' ? styles.ctrlActive : ''}`}
           onClick={toggleRepeat}
           aria-label="Repeat"
         >
@@ -143,35 +160,41 @@ export function PlayerFooter() {
 
       {/* Volume + time */}
       <div className={styles.right} onClick={(e) => e.stopPropagation()}>
-        <span className={styles.time}>{formatTime(progress)}</span>
-        <span className={styles.timeSep}>/</span>
-        <span className={styles.time}>{formatTime(duration)}</span>
+        <div className={styles.desktopOnly}>
+          <div className={styles.timeWrap}>
+            <span className={styles.time}>{formatTime(progress)}</span>
+            <span className={styles.timeSep}>/</span>
+            <span className={styles.time}>{formatTime(duration)}</span>
+          </div>
 
-        <button className={styles.ctrlBtn} onClick={toggleMute} aria-label="Mute">
-          {isMuted || volume === 0 ? <VolumeMuteIcon size={16} /> : <VolumeIcon size={16} />}
-        </button>
-
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={isMuted ? 0 : volume}
-          onChange={(e) => setVolume(Number(e.target.value))}
-          className={styles.volumeSlider}
-          aria-label="Volume"
-        />
+          <div className={styles.volumeWrap}>
+            <button className={styles.ctrlBtn} onClick={toggleMute} aria-label="Mute">
+              {isMuted || volume === 0 ? <VolumeMuteIcon size={16} /> : <VolumeIcon size={16} />}
+            </button>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={isMuted ? 0 : volume}
+              onChange={(e) => setVolume(Number(e.target.value))}
+              className={styles.volumeSlider}
+              aria-label="Volume"
+            />
+          </div>
+        </div>
 
         <button 
           className={`${styles.ctrlBtn} ${isQueueOpen ? styles.ctrlActive : ''}`} 
           onClick={(e) => { e.stopPropagation(); setIsQueueOpen(!isQueueOpen); }}
           title="Queue"
         >
-          <PlusSquareIcon size={18} />
+          <QueueIcon size={18} />
         </button>
       </div>
 
       <QueueDrawer isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
+      {showPlaylist && <PlaylistSelector track={currentTrack} onClose={() => setShowPlaylist(false)} />}
     </footer>
   );
 }

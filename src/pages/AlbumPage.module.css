@@ -9,6 +9,14 @@
 .back:hover { color: var(--text-primary); }
 
 .header { display: flex; gap: 24px; margin-bottom: 28px; align-items: flex-start; flex-wrap: wrap; }
+@media (max-width: 600px) {
+  .header { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+  .artWrap { width: 180px; height: 180px; margin: 0 auto; }
+  .meta { align-items: center; width: 100%; text-align: center; }
+  .artistLink { text-align: center; width: 100%; }
+  .metaRow { justify-content: center; width: 100%; }
+  .playAllBtn { margin: 12px auto 0; }
+}
 .artWrap { width: 160px; height: 160px; flex-shrink: 0; border: 2px solid var(--border); overflow: hidden; }
 @media (min-width: 600px) { .artWrap { width: 200px; height: 200px; } }
 .art { width: 100%; height: 100%; object-fit: cover; }

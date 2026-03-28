@@ -81,23 +81,30 @@ export const usePlayerStore = create(
     },
 
     moveInQueue: (from, to) => {
-      const { queue, queueIndex } = get();
+      const { queue, queueIndex, currentTrack } = get();
       if (from < 0 || from >= queue.length || to < 0 || to >= queue.length) return;
+      if (from === to) return;
       
       const newQueue = [...queue];
       const [removed] = newQueue.splice(from, 1);
       newQueue.splice(to, 0, removed);
       
-      let newIndex = queueIndex;
-      if (from === queueIndex) {
-        newIndex = to;
-      } else if (from < queueIndex && to >= queueIndex) {
-        newIndex = queueIndex - 1;
-      } else if (from > queueIndex && to <= queueIndex) {
-        newIndex = queueIndex + 1;
-      }
+      // Find where the current track moved to
+      // We use the unique track ID (or reference) to be 100% sure
+      const newIndex = newQueue.findIndex((t, i) => {
+        // If we are moving the current track itself, its new index is 'to'
+        if (from === queueIndex) return i === to;
+        // Otherwise, find it by ID
+        return t.id === currentTrack?.id;
+      });
       
-      set({ queue: newQueue, queueIndex: newIndex });
+      set({ queue: newQueue, queueIndex: newIndex !== -1 ? newIndex : queueIndex });
+    },
+
+    reorderQueue: (newQueue) => {
+      const { currentTrack } = get();
+      const newIndex = newQueue.findIndex(t => t.id === currentTrack?.id);
+      set({ queue: newQueue, queueIndex: newIndex !== -1 ? newIndex : get().queueIndex });
     },
 
     jumpToQueueIndex: (index) => {
@@ -150,16 +157,16 @@ export const usePlayerStore = create(
     },
 
     prev: () => {
-      const { queue, queueIndex, progress } = get();
+      const { queue, queueIndex } = get();
       if (!queue.length) return;
 
-      // If more than 3s in, restart current track
-      if (progress > 3) {
+      const prevIndex = queueIndex - 1;
+      if (prevIndex < 0) {
+        // Already at first track, just restart
         set({ progress: 0 });
         return;
       }
 
-      const prevIndex = Math.max(0, queueIndex - 1);
       set({
         queueIndex: prevIndex,
         currentTrack: queue[prevIndex],

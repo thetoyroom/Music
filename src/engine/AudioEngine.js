@@ -127,6 +127,15 @@ class AudioEngine {
       }
 
       const el = this._mediaElement();
+      
+      // Stop current playback and clear source to prevent buffer bleed
+      if (el) {
+        el.pause();
+        if (!this._useShaka) {
+          el.src = "";
+          el.load();
+        }
+      }
 
       if (this._useShaka && (manifestUrl || (manifest && manifest.includes('MPD')))) {
         await this._shaka.load(manifestUrl ?? url);
@@ -177,19 +186,33 @@ class AudioEngine {
 
   _onEnded() {
     const { repeat, next } = usePlayerStore.getState();
+    const el = this._mediaElement();
     if (repeat === 'one') {
-      const el = this._mediaElement();
-      el.currentTime = 0;
-      el.play().catch(() => {});
+      if (el) {
+        el.currentTime = 0;
+        el.play().catch(e => {
+          console.warn('[AudioEngine] Repeat playback blocked:', e);
+          // Try again after 1s if blocked
+          setTimeout(() => el.play().catch(() => {}), 1000);
+        });
+      }
     } else {
+      console.log('[AudioEngine] Track ended, moving to next');
       next();
+      // Ensure we attempt to trigger the next track's load/play immediately
     }
   }
 
   _onError(e) {
-    console.error('[AudioEngine] Media error:', e);
-    const { setStreamError } = usePlayerStore.getState();
+    const el = this._mediaElement();
+    console.error('[AudioEngine] Media element error:', e, el?.error);
+    const { setStreamError, next } = usePlayerStore.getState();
     setStreamError('Playback error. Trying next track…');
+    
+    // Auto-skip after 2s on error to prevent being stuck
+    setTimeout(() => {
+      if (this._currentTrackId) next();
+    }, 2000);
   }
 
   _onShakaError(e) {
@@ -218,7 +241,11 @@ class AudioEngine {
     ms.setActionHandler('play', () => usePlayerStore.getState().setIsPlaying(true));
     ms.setActionHandler('pause', () => usePlayerStore.getState().setIsPlaying(false));
     ms.setActionHandler('nexttrack', () => usePlayerStore.getState().next());
-    ms.setActionHandler('previoustrack', () => usePlayerStore.getState().prev());
+    ms.setActionHandler('previoustrack', () => {
+      const { progress, prev } = usePlayerStore.getState();
+      if (progress > 3) this.seek(0);
+      else prev();
+    });
     ms.setActionHandler('seekto', (d) => this.seek(d.seekTime));
   }
 

@@ -62,6 +62,25 @@ export const useAppStore = create(
           ),
         }));
       },
+      saveImportedPlaylist: (playlist) => {
+        const id = `pl_import_${Date.now()}`;
+        set((s) => ({
+          playlists: [...s.playlists, { 
+            id, 
+            name: playlist.name || 'Imported Playlist', 
+            tracks: playlist.tracks || [], 
+            createdAt: Date.now(),
+            platform: playlist.platform,
+            externalId: playlist.id
+          }],
+        }));
+        return id;
+      },
+      deletePlaylist: (id) => {
+        set((s) => ({
+          playlists: s.playlists.filter((p) => p.id !== id),
+        }));
+      },
 
       // ─── Onboarding ───────────────────────────────────────────────────────
       hasCompletedOnboarding: false,
@@ -88,17 +107,6 @@ export const useAppStore = create(
         set((s) => ({
           downloads: s.downloads.filter((d) => d.id !== id),
         })),
-      setGaplessPlayback: (val) => set({ gaplessPlayback: val }),
-
-      // ─── Onboarding ───────────────────────────────────────────────────────
-      hasCompletedOnboarding: false,
-      gaplessPlayback: true,
-      onboardingData: {
-        genres: [],
-        artists: [],
-      },
-      completeOnboarding: (data) =>
-        set({ onboardingData: data, hasCompletedOnboarding: true }),
     }),
     {
       name: 'steqmusic-app-store',
@@ -109,7 +117,6 @@ export const useAppStore = create(
         likedTracks: s.likedTracks,
         playlists: s.playlists,
         hasCompletedOnboarding: s.hasCompletedOnboarding,
-        gaplessPlayback: s.gaplessPlayback,
         onboardingData: s.onboardingData,
       }),
     }
